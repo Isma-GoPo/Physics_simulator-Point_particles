@@ -3,22 +3,33 @@
 import numpy as np
 
 class Particle:
-    def __init__(self, mass: float, initial_position: np.ndarray = np.zeros(3), initial_velocity: np.ndarray = np.zeros(3), initial_acceleration: np.ndarray = np.zeros(3)) -> None:
+    def __init__(self, mass: float, 
+                 initial_position: np.ndarray = np.zeros(3), 
+                 initial_velocity: np.ndarray = np.zeros(3), 
+                 initial_acceleration: np.ndarray = np.zeros(3),
+                 *,
+                 acceleration_field: np.ndarray = np.zeros(3)
+                 ) -> None:
         """Init a 'Particle' object
 
-        Keyword arguments:
+        Possitional-Keyword arguments:
         mass: [kg] the mass of the particle (only +)
         initial_position: [m] a 3D numpy array for initial coordinates x, y, z. Default: (0, 0, 0)
         initial_velocity: [m/s] a 3D numpy array for initial velocities in x, y, z. Default: (0, 0, 0)
         initial_acceleration: [m/s2] a 3D numpy array for initial accelerations in x, y, z. Default: (0, 0, 0)
+            Do not include the acceleration due to the acceleration field
+        
+        Keyword arguments:
+        acceleration_field: [m/s2] a 3D numpy array for a constant acceleration that will be always applied when updating
+            to the next step. In x, y, z. Default: (0, 0, 0)
         """
-
         self.mass = mass
         self.position = initial_position
         self.velocity = initial_velocity
         self.last_velocity = np.zeros(3)
-        self.acceleration = initial_acceleration
+        self.acceleration = initial_acceleration + acceleration_field
         self.last_acceleration = np.zeros(3)
+        self.acceleration_field = acceleration_field
     
     def __str__(self) -> str:
         class_name = self.__class__.__name__
@@ -86,10 +97,10 @@ class Particle:
 
     def store_current_state(self) -> None:
         """Stores the current velocity and acceleration as the last ones and reset them."""
-        self.last_velocity = self.velocity.copy()
+        self.last_velocity = self.velocity.copy() # .copy() because ndarray is mutable
         # velocity is preserved (conservation of momentum)
-        self.last_acceleration = self.acceleration.copy()
-        self.acceleration = np.zeros(3)
+        self.last_acceleration = self.acceleration.copy() # .copy() because ndarray is mutable
+        self.acceleration = self.acceleration_field.copy()  # Reset acceleration to the field value
 
     def advance_time_step(self, time_step: float = 1.0) -> None:
         """Advances the particle's state by one time step, accelerating and translating it.
@@ -105,9 +116,8 @@ if __name__=="__main__":
     gravity = np.array([0.0, 0.0, -9.81])  # Gravity vector in m/s^2 
     # make it a constant!!!
     # Make that it is always in the store_current_state() (it always applies gravity)
-    particle = Particle(1.0, initial_acceleration=gravity)
+    particle = Particle(1.0, acceleration_field = gravity)
     print(particle)
-    particle.apply_acceleration(gravity)  # Apply gravity
     particle.advance_time_step(1.0)  # Advance one second
     print(particle)
     particle.advance_time_step(1.0)  # Advance another second   
