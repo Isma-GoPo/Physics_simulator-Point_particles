@@ -3,11 +3,11 @@ import numpy as np
 
 from constants import *
 
-def function1(variable1:"type")->"type":
+def function(variable1:...)->...:
     '''Docummentation'''
-    pass
+    ...
 
 
-# for testing without afection the main file
+# for testing without afecting the main file
 if __name__ == "__main__":
-    pass
+    ...

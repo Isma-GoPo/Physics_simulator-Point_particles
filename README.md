@@ -1,25 +1,24 @@
 ## Project Description
-This is a Minigame Programm that show several randomized figures so the user have to count them as quickly as possible to give the result.
+This is a learning physics programm that simulates the dynamics of puntual charges in a space, using Newton and gravity/Coulomb equations for calculating forces and then basic cinematic equation for tracing the trajectories.
 
 ## Python used libraries / functions
 The programm would be using 
-- CustomTkinter for the minigame interface
-- Numpy for the numbers and random distributions (not necessary but for learning it)
-- Pandas for saving best times in games (not necessary but for learning it)
+- Numpy for the numbers and calculations.
+- In a future, Pandas to import first data and export the calculations from/to a .csv 
 - Error Handling in the class initializing (raising Exceptions)
 - Propper Documentation
+- Git repository
+- Uploading to GitHub
 
 ## Other software use
-- [Vercel v0](https://v0.dev/chat/c1Q9lJbrrt3) as a tool for going faster
+- Github
 
 ## Project goals
 The programm would have to possibility:
-- Display a random number of objects in a window, without collaiding with each others. Then having an number input to show a score output.
-- Be able to save the games in a csv.
+- Given the initial position, velocities and the particles and masses (and charges) calculate reiteratively the new velocities and positions
+- Displaying this in a graphic way.
+- Be able to export the calculations to a file.
 
 ## Development
-1. I asked `Vercel v0`:
-	"Generate a Python App using customtkinter. The app must have three main elements: a big display window, and a frame with an input and an a score output. The app shows several randomized simple figures (circles, squares, may be stars, etc) so the user have to count them as quickly as possible to give the result."
-	- Then I pasted to see if it works
-2. Understanding what it has done 
-3. Commenting and editing code for making it as I would do it.
+1. I have been looking at an [old repository](https://github.com/Isma-GoPo/Puntual_Charges_Physics_Simulator.git) I made a year ago.	
+   But I've been slowly adding the features to make it better and smaller. The old project was more ambitious than what I could manage.
