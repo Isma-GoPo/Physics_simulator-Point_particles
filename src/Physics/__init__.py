@@ -6,5 +6,6 @@ The package includes:
 
 from .particle import Particle
 from . import linearalgebra
+from .physics_constants import *
 
-__all__ = ["Particle", "linearalgebra"]
+__all__ = ["Particle", "linearalgebra", "physics_constants"]
