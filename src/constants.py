@@ -10,7 +10,7 @@ X_Y_Z_FRAME_LIMIT: [m] (ndarray) The positive distance in the 3D space on wich t
 import numpy as np
 
 TIME_STEP: float = 0.1  # How much it "tick" advance the time in the simulation (in [s])
-SIMULATION_TIME: float = 3.0  # How much the simulation last (in [s])
+SIMULATION_TIME: float = 10.0  # How much the simulation last (in [s])
 NUMBER_OF_TIME_STEPS: int = int(SIMULATION_TIME / TIME_STEP)  # How many time steps will be done in the simulation
 
 X_Y_Z_FRAME_LIMIT = np.array([1, 1, 1], dtype=float)

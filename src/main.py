@@ -6,11 +6,12 @@ from icecream import ic
 from functions import *
 from constants import *
 import physics
+from simulation import print_simulation_animation
 
 # Here is where the main program goes. It should be documented and organised by modules
 def run_simulation() -> np.ndarray:
     """Run the simulation of a particle under the influence of gravity."""
-    particle = physics.Particle(1.0, acceleration_field = physics.GRAVITY)
+    particle = physics.Particle(1.0, initial_velocity = np.array([1.0,0.0,0.0]), acceleration_field = physics.GRAVITY)
 
     # Initialize an empty array to store positions
     positions = np.empty((0, 3), float)
@@ -28,7 +29,7 @@ def run_simulation() -> np.ndarray:
 if __name__=="__main__":
     positions = run_simulation()
     print(f"Positions after {NUMBER_OF_TIME_STEPS} time steps:\n{positions}")
-
+    print_simulation_animation(positions)
     
     
     
