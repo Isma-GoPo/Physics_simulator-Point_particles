@@ -1,10 +1,10 @@
 """This module introduces the constants for the program
 
 Constants:
-SIMULATION_STEP: [s] (float) How much it "tick" advance the time in the simulation
+TIME_STEP: [s] (float) How much it "tick" advance the time in the simulation
 SIMULATION_TIME: [s] (float) How much the simulation last
+NUMBER_OF_TIME_STEPS: [int] number time steps will be done in the simulation
 X_Y_Z_FRAME_LIMIT: [m] (ndarray) The positive distance in the 3D space on wich the particles can be. Negative distant will be symetric
-PRINT_RESOLUTION: [characters] (ndarray) The lenght in x, y and z axis that the printing will take in the terminal
 """
 
 import numpy as np

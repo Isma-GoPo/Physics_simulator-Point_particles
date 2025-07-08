@@ -8,15 +8,27 @@ from constants import *
 import physics
 
 # Here is where the main program goes. It should be documented and organised by modules
-
-# Running the file
-if __name__=="__main__":
-
-
+def run_simulation() -> np.ndarray:
+    """Run the simulation of a particle under the influence of gravity."""
     particle = physics.Particle(1.0, acceleration_field = physics.GRAVITY)
-    
+
+    # Initialize an empty array to store positions
     positions = np.empty((0, 3), float)
+
+    # Advance the particle through time steps
     for _ in range(NUMBER_OF_TIME_STEPS):
         positions = np.vstack((positions, [particle.position]))
         particle.advance_time_step(TIME_STEP)
-    print(f"Positions after 20 time steps: {positions}")
+
+    print(f"Positions after {NUMBER_OF_TIME_STEPS} time steps:\n{positions}")
+    return positions
+    
+
+# Running the file
+if __name__=="__main__":
+    positions = run_simulation()
+    print(f"Positions after {NUMBER_OF_TIME_STEPS} time steps:\n{positions}")
+
+    
+    
+    
