@@ -1,0 +1,114 @@
+"""`paricle` module include the `Particle` class"""
+
+import numpy as np
+
+class Particle:
+    def __init__(self, mass: float, initial_position: np.ndarray = np.zeros(3), initial_velocity: np.ndarray = np.zeros(3), initial_acceleration: np.ndarray = np.zeros(3)) -> None:
+        """Init a 'Particle' object
+
+        Keyword arguments:
+        mass: [kg] the mass of the particle (only +)
+        initial_position: [m] a 3D numpy array for initial coordinates x, y, z. Default: (0, 0, 0)
+        initial_velocity: [m/s] a 3D numpy array for initial velocities in x, y, z. Default: (0, 0, 0)
+        initial_acceleration: [m/s2] a 3D numpy array for initial accelerations in x, y, z. Default: (0, 0, 0)
+        """
+
+        self.mass = mass
+        self.position = initial_position
+        self.velocity = initial_velocity
+        self.last_velocity = np.zeros(3)
+        self.acceleration = initial_acceleration
+        self.last_acceleration = np.zeros(3)
+    
+    def __str__(self) -> str:
+        class_name = self.__class__.__name__
+        attributes = '\n'.join(f"  {key}: {value}" for key, value in self.__dict__.items())
+        return f"<{class_name} object at {hex(id(self))}>\n{attributes}"
+
+    def __repr__(self) -> str:
+        class_name = self.__class__.__name__
+        attributes = ', '.join(f"{key} = {repr(value)}" for key, value in self.__dict__.items())
+        return f"{class_name}({attributes})"
+
+    def mean_velocity(self) -> np.ndarray:
+        """Returns the mean velocity of the particle (between the current and the last one)"""
+        return (self.velocity + self.last_velocity) / 2
+
+    def do_translate(self, time_step: float = 1.0, forced_velocity: np.ndarray = None) -> None:
+        """Translate (move) the position of the particle according to the velocity (inner or given) during the given time step.
+
+        Keyword arguments:
+        time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
+        forced_velocity: [m/s] a 3D numpy array for velocity in x, y, z
+          If no velocity is given, it takes the velocity of the object
+        """
+        if forced_velocity is None:
+            velocity = self.mean_velocity()
+        else:
+            velocity = forced_velocity
+        
+        self.position += velocity * time_step
+    
+    def mean_acceleration(self) -> np.ndarray:
+        """Returns the mean acceleration of the particle (between the current and the last one)"""
+        return (self.acceleration + self.last_acceleration) / 2
+
+    def do_accelerate(self, time_step: float = 1.0, forced_acceleration: np.ndarray = None) -> None:
+        """Updates the velocity of the particle according to the acceleration (inner or given) during the given time step.
+
+        Keyword arguments:
+        time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
+        forced_acceleration: [m/s2] a 3D numpy array for acceleration in x, y, z
+          If no acceleration is given, it takes the acceleration of the object
+        """
+        if forced_acceleration is None:
+            acceleration = self.mean_acceleration()
+        else:
+            acceleration = forced_acceleration
+        
+        self.velocity += acceleration * time_step
+
+    def apply_force(self, applied_force: np.ndarray) -> None:
+        """Applies a force to the particle, updating its acceleration.
+
+        Keyword arguments:
+        applied_force: [N] a 3D numpy array for the force in x, y, z
+        """
+        self.acceleration += applied_force / self.mass
+
+    def apply_acceleration(self, applied_acceleration: np.ndarray) -> None:
+        """Applies an acceleration to the particle, updating its acceleration.
+
+        Keyword arguments:
+        applied_acceleration: [m/s2] a 3D numpy array for the acceleration in x, y, z
+        """
+        self.acceleration += applied_acceleration
+
+    def store_current_state(self) -> None:
+        """Stores the current velocity and acceleration as the last ones and reset them."""
+        self.last_velocity = self.velocity.copy()
+        # velocity is preserved (conservation of momentum)
+        self.last_acceleration = self.acceleration.copy()
+        self.acceleration = np.zeros(3)
+
+    def advance_time_step(self, time_step: float = 1.0) -> None:
+        """Advances the particle's state by one time step, accelerating and translating it.
+
+        Keyword arguments:
+        time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
+        """
+        self.do_accelerate(time_step)
+        self.do_translate(time_step)
+        self.store_current_state()
+
+if __name__=="__main__":
+    gravity = np.array([0.0, 0.0, -9.81])  # Gravity vector in m/s^2 
+    # make it a constant!!!
+    # Make that it is always in the store_current_state() (it always applies gravity)
+    particle = Particle(1.0, initial_acceleration=gravity)
+    print(particle)
+    particle.apply_acceleration(gravity)  # Apply gravity
+    particle.advance_time_step(1.0)  # Advance one second
+    print(particle)
+    particle.advance_time_step(1.0)  # Advance another second   
+    print(particle)
