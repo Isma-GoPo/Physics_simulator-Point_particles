@@ -45,7 +45,7 @@ class Particle:
         """Returns the mean velocity of the particle (between the current and the last one)"""
         return (self.velocity + self.last_velocity) / 2
 
-    def do_translate(self, time_step: float = 1.0, forced_velocity: np.ndarray = None) -> None:
+    def do_translate(self, time_step: float = 1.0, forced_velocity: np.ndarray | None = None) -> None:
         """Translate (move) the position of the particle according to the velocity (inner or given) during the given time step.
 
         Keyword arguments:
@@ -64,7 +64,7 @@ class Particle:
         """Returns the mean acceleration of the particle (between the current and the last one)"""
         return (self.acceleration + self.last_acceleration) / 2
 
-    def do_accelerate(self, time_step: float = 1.0, forced_acceleration: np.ndarray = None) -> None:
+    def do_accelerate(self, time_step: float = 1.0, forced_acceleration: np.ndarray | None = None) -> None:
         """Updates the velocity of the particle according to the acceleration (inner or given) during the given time step.
 
         Keyword arguments:

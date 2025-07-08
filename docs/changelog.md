@@ -1,6 +1,9 @@
 This is the log file. Its purpose is to have an idea of what I have done when I enter the project long time later.
 
-## [2025-07-08]
+## v0.1 [2025-07-08]
+Adding the particle class and its basic methods.
+
+## v0.0 [2025-07-08]
 Starting the project.
 ###### Documentation
 I wrote the basic documentation for the project.

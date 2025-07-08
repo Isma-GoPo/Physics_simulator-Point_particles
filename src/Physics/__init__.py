@@ -4,6 +4,7 @@ The package includes:
 - 'Particle' class: contains all the information that a puntual charge must have.
 """
 
-from particle import Particle
+from .particle import Particle
+from . import linearalgebra
 
-__all__ = []
+__all__ = ["Particle", "linearalgebra"]
