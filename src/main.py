@@ -6,7 +6,7 @@ from icecream import ic
 from functions import *
 from constants import *
 import physics
-from simulation import print_simulation_animation
+from plotting import print_simulation_animated
 
 # Here is where the main program goes. It should be documented and organised by modules
 def run_simulation() -> np.ndarray:
@@ -21,7 +21,6 @@ def run_simulation() -> np.ndarray:
         positions = np.vstack((positions, [particle.position]))
         particle.advance_time_step(TIME_STEP)
 
-    print(f"Positions after {NUMBER_OF_TIME_STEPS} time steps:\n{positions}")
     return positions
     
 
@@ -29,7 +28,8 @@ def run_simulation() -> np.ndarray:
 if __name__=="__main__":
     positions = run_simulation()
     print(f"Positions after {NUMBER_OF_TIME_STEPS} time steps:\n{positions}")
-    print_simulation_animation(positions)
+    print_simulation_animated(positions)
+    print(NUMBER_OF_TIME_STEPS)
     
     
     
