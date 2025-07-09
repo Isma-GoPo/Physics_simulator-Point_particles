@@ -1,3 +1,8 @@
+"""This module introduces the neccesary functions for printing an animation of the simulation
+
+Functions:
+stack_positions: Stack the positions of multiple particles into a single numpy array.
+"""
 import numpy as np
 
 def stack_positions(*particles_positions: np.ndarray) -> np.ndarray:

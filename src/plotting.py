@@ -2,7 +2,8 @@
 
 Functions:
 print_simulation_static: Open a window to show a static plot of the position of one particle.
-print_simulation_animation: Open a window to show the simulation animation of the position of one particle.
+print_simulation_animated: Open a window to show the simulation animation of multiple particles.
+print_simulation_animated_one_particle: Open a window to show the simulation animation of a single particle.
 """
 import numpy as np
 import matplotlib.pyplot as plt
