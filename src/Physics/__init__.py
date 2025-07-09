@@ -5,6 +5,7 @@ The package includes:
 """
 
 from .particle import Particle
+from .particle_space import ParticleSpace
 from . import linearalgebra
 from .physics_constants import *
 

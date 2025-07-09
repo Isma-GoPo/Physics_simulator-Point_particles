@@ -9,27 +9,21 @@ import utils
 import physics
 from plotting import print_simulation_animated
 
-# Here is where the main program goes. It should be documented and organised by modules
-def run_simulation() -> np.ndarray:
-    """Run the simulation of a particle under the influence of gravity."""
-    particle = utils.init.free_falling_particle()
-    print(particle)
-
-    # Advance the particle through time steps
-    for _ in range(NUMBER_OF_TIME_STEPS):
-        particle.advance_time_step(TIME_STEP)
-
-    return particle.position_history
-    
+def define_simulation_setup() -> physics.ParticleSpace:
+    """Define the simulation setup with particles."""
+    space = physics.ParticleSpace()
+    space.append(utils.init.free_falling_particle())
+    space.append(utils.init.free_falling_particle(np.array([1.0, 0.0, 200.0])))
+    return space    
 
 # Running the file
 if __name__=="__main__":
-    position1 = run_simulation()
-    position2 = run_simulation()*2
-    #print(f"Positions after {NUMBER_OF_TIME_STEPS} time steps:\n{position1}")
-    #print_simulation_animated_one_particle(position1)
-    print_simulation_animated(position1, position1+1, position2)
-    #print(NUMBER_OF_TIME_STEPS)
+    space = define_simulation_setup()
+    print(space)
+    print(repr(space))
+
+    space.run_simulation(NUMBER_OF_TIME_STEPS, TIME_STEP)
+    
     
     
     

@@ -1,4 +1,4 @@
-"""`paricle` module include the `Particle` class"""
+"""`particle` module include the `Particle` class"""
 
 import numpy as np
 

@@ -14,7 +14,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import physics
 from constants import *
 
-def free_falling_particle() -> physics.Particle:
+def free_falling_particle(initial_position: np.ndarray | None = None) -> physics.Particle:
     """Creates a particle with mass=1, Vx=1 and with gravity field."""
-    particle = physics.Particle(1.0, initial_velocity = np.array([1.0,0.0,0.0]), acceleration_field = physics.GRAVITY)
+    initial_position = initial_position if initial_position is not None else np.zeros(3)
+    particle = physics.Particle(1.0, initial_position=initial_position, initial_velocity = np.array([1.0,0.0,0.0]), acceleration_field = physics.GRAVITY)
     return particle
