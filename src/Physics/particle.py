@@ -27,11 +27,28 @@ class Particle:
         # np.ndarray is mutable, so initializing with None and then setting to np.zeros(3) is needed
         self.position = initial_position if initial_position is not None else np.zeros(3)
         self.velocity = initial_velocity if initial_velocity is not None else np.zeros(3)
-        self.acceleration = initial_acceleration if initial_acceleration is not None else np.zeros(3)
         self.acceleration_field = acceleration_field if acceleration_field is not None else np.zeros(3)
-        self.acceleration = self.acceleration + self.acceleration_field # Add the acceleration field to the initial acceleration
-        self.last_velocity = np.zeros(3)
-        self.last_acceleration = np.zeros(3)
+        initial_acceleration = initial_acceleration if initial_acceleration is not None else np.zeros(3)
+        self.acceleration = initial_acceleration + self.acceleration_field # Add the acceleration field to the initial acceleration
+        
+        self._last_velocity = np.zeros(3)
+        self._last_acceleration = np.zeros(3)
+        self._position_history = np.empty((0, 3), float)
+
+    @property
+    def last_velocity(self) -> np.ndarray:
+        """Read-only access to the position history."""
+        return self._last_velocity.copy()
+
+    @property
+    def last_acceleration(self) -> np.ndarray:
+        """Read-only access to the position history."""
+        return self._last_acceleration.copy()
+
+    @property
+    def position_history(self) -> np.ndarray:
+        """Read-only access to the position history."""
+        return self._position_history.copy()
     
     def __str__(self) -> str:
         class_name = self.__class__.__name__
@@ -46,6 +63,10 @@ class Particle:
     def mean_velocity(self) -> np.ndarray:
         """Returns the mean velocity of the particle (between the current and the last one)"""
         return (self.velocity + self.last_velocity) / 2
+    
+    def mean_acceleration(self) -> np.ndarray:
+        """Returns the mean acceleration of the particle (between the current and the last one)"""
+        return (self.acceleration + self.last_acceleration) / 2
 
     def do_translate(self, time_step: float = 1.0, forced_velocity: np.ndarray | None = None) -> None:
         """Translate (move) the position of the particle according to the velocity (inner or given) during the given time step.
@@ -61,10 +82,6 @@ class Particle:
             velocity = forced_velocity
         
         self.position += velocity * time_step
-    
-    def mean_acceleration(self) -> np.ndarray:
-        """Returns the mean acceleration of the particle (between the current and the last one)"""
-        return (self.acceleration + self.last_acceleration) / 2
 
     def do_accelerate(self, time_step: float = 1.0, forced_acceleration: np.ndarray | None = None) -> None:
         """Updates the velocity of the particle according to the acceleration (inner or given) during the given time step.
@@ -97,11 +114,16 @@ class Particle:
         """
         self.acceleration += applied_acceleration
 
+    def store_position_in_history(self) -> None:
+        """Stores the current position in the position history."""
+        self._position_history = np.vstack((self.position_history, [self.position]))
+
     def store_current_state(self) -> None:
-        """Stores the current velocity and acceleration as the last ones and reset them."""
-        self.last_velocity = self.velocity.copy() # .copy() because ndarray is mutable
+        """Stores the current position in history and velocity and acceleration as the last ones and reset them."""
+        self.store_position_in_history()
+        self._last_velocity = self.velocity.copy() # .copy() because ndarray is mutable
         # velocity is preserved (conservation of momentum)
-        self.last_acceleration = self.acceleration.copy() # .copy() because ndarray is mutable
+        self._last_acceleration = self.acceleration.copy() # .copy() because ndarray is mutable
         self.acceleration = self.acceleration_field.copy()  # Reset acceleration to the field value
 
     def advance_time_step(self, time_step: float = 1.0) -> None:
