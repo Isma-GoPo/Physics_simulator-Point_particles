@@ -4,11 +4,11 @@ import numpy as np
 
 class Particle:
     def __init__(self, mass: float, 
-                 initial_position: np.ndarray = np.zeros(3), 
-                 initial_velocity: np.ndarray = np.zeros(3), 
-                 initial_acceleration: np.ndarray = np.zeros(3),
+                 initial_position: np.ndarray | None = None, 
+                 initial_velocity: np.ndarray | None = None, 
+                 initial_acceleration: np.ndarray | None = None,
                  *,
-                 acceleration_field: np.ndarray = np.zeros(3)
+                 acceleration_field: np.ndarray | None = None
                  ) -> None:
         """Init a 'Particle' object
 
@@ -24,12 +24,14 @@ class Particle:
             to the next step. In x, y, z. Default: (0, 0, 0)
         """
         self.mass = mass
-        self.position = initial_position
-        self.velocity = initial_velocity
+        # np.ndarray is mutable, so initializing with None and then setting to np.zeros(3) is needed
+        self.position = initial_position if initial_position is not None else np.zeros(3)
+        self.velocity = initial_velocity if initial_velocity is not None else np.zeros(3)
+        self.acceleration = initial_acceleration if initial_acceleration is not None else np.zeros(3)
+        self.acceleration_field = acceleration_field if acceleration_field is not None else np.zeros(3)
+        self.acceleration = self.acceleration + self.acceleration_field # Add the acceleration field to the initial acceleration
         self.last_velocity = np.zeros(3)
-        self.acceleration = initial_acceleration + acceleration_field
         self.last_acceleration = np.zeros(3)
-        self.acceleration_field = acceleration_field
     
     def __str__(self) -> str:
         class_name = self.__class__.__name__
