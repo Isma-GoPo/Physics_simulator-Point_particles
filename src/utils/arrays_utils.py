@@ -18,8 +18,6 @@ def stack_positions(*particles_positions: np.ndarray) -> np.ndarray:
     """
     return np.stack(particles_positions, axis=1)
 
-
-
 def limit_force_module(force_func: Callable[P, np.ndarray], max_force_module: float | np.ndarray = MAX_FORCE_MODULE) -> Callable[P, np.ndarray]:
     @wraps(force_func) # Copy attributes (e.g. `__doc__`) from the wrapped function (debbuging)
     def wrapper_function(*args, **kwargs):
