@@ -60,13 +60,13 @@ class Particle:
         attributes = ', '.join(f"{key} = {repr(value)}" for key, value in self.__dict__.items())
         return f"{class_name}({attributes})"
 
-    def mean_velocity(self) -> np.ndarray:
-        """Returns the mean velocity of the particle (between the current and the last one)"""
+    def velocity_to_apply(self) -> np.ndarray:
+        """Returns the velocity of the particle that should have when translating the particle positions"""
         return (self.velocity + self.last_velocity) / 2
     
-    def mean_acceleration(self) -> np.ndarray:
-        """Returns the mean acceleration of the particle (between the current and the last one)"""
-        return (self.acceleration + self.last_acceleration) / 2
+    def acceleration_to_apply(self) -> np.ndarray:
+        """Returns the acceleration of the particle that should have when translating the particle positions"""
+        return self.acceleration #(self.acceleration + self.last_acceleration) / 2
 
     def do_translate(self, time_step: float = 1.0, forced_velocity: np.ndarray | None = None) -> None:
         """Translate (move) the position of the particle according to the velocity (inner or given) during the given time step.
@@ -77,7 +77,7 @@ class Particle:
           If no velocity is given, it takes the velocity of the object
         """
         if forced_velocity is None:
-            velocity = self.mean_velocity()
+            velocity = self.velocity_to_apply()
         else:
             velocity = forced_velocity
         
@@ -92,7 +92,7 @@ class Particle:
           If no acceleration is given, it takes the acceleration of the object
         """
         if forced_acceleration is None:
-            acceleration = self.mean_acceleration()
+            acceleration = self.acceleration_to_apply()
         else:
             acceleration = forced_acceleration
         
