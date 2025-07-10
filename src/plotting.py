@@ -21,12 +21,11 @@ def print_simulation_animated(*particle_positions: np.ndarray) -> None:
     Arguments:
     *particle_positions: [m] Variable number of numpy arrays of shape m×n×3 being n: number of time steps; and 3: x, y, z coordinates.
     """
-    t = np.linspace(0, SIMULATION_TIME, NUMBER_OF_TIME_STEPS+1)
 
     particles_positions = utils.stack_positions(*particle_positions) # ndarray of shape n×m×3 being n: number of time steps; m: number of particles; and 3: x, y, z coordinates.
 
-    x = particles_positions[:,:,0]
-    y = particles_positions[:,:,2]
+    x = particles_positions[::PLOTTING_RELATIVE_TIME_STEP,:,0]
+    y = particles_positions[::PLOTTING_RELATIVE_TIME_STEP,:,2]
 
     fig, axis = plt.subplots()
     axis.set_xlim(np.min(x), np.max(x))
@@ -41,9 +40,9 @@ def print_simulation_animated(*particle_positions: np.ndarray) -> None:
 
     animation = FuncAnimation(fig=plt.gcf(), 
                               func=update_plot_data, 
-                              frames = NUMBER_OF_TIME_STEPS, 
-                              #repeat=False,
-                              interval=TIME_STEP*1000
+                              frames = NUMBER_OF_PLOTTING_STEPS, 
+                              repeat=DO_REPEAT_PLOTTING,
+                              interval=1/PLOTTING_STEPS_PER_SECOND*1000
                               )
 
     plt.show()
