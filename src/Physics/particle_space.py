@@ -35,19 +35,19 @@ class ParticleSpace(list):
             particle.advance_time_step(time_step)
 
     def iterate_time_step(self, time_step: float = 1., 
-                          self_dynamic_operation_array: tuple[Callable[[Particle], None], ...] = (), 
+                          own_dynamic_operation_array: tuple[Callable[[Particle], None], ...] = (), 
                           couple_dynamic_operation_array: tuple[Callable[[Particle, Particle], None], ...] = ()) -> None:
         """Advance all particles in the space for the given steps operating with the given functions.
         
         Arguments:
         time_step: [s] the time step to advance each particle.
-        self_dynamic_operation_array: A tuple of functions that will be applied to each particle in the space.
+        own_dynamic_operation_array: A tuple of functions that will be applied to each particle in the space.
         couple_dynamic_operation_array: A tuple of functions that will be applied to pairs of particles in the space.
         """
         # Apply self operations to each particle
         for particle in self:
-            for self_dynamic_operation in self_dynamic_operation_array:
-                self_dynamic_operation(particle)
+            for own_dynamic_operation in own_dynamic_operation_array:
+                own_dynamic_operation(particle)
         
         # Apply couple operations to each pair of particles
         for i, particle1 in enumerate(self):
@@ -58,16 +58,16 @@ class ParticleSpace(list):
         self.advance_time_step(time_step)
 
     def run_simulation(self, numer_of_time_steps: int, time_step: float = 1.,
-                       self_dynamic_operation_array: tuple[Callable[[Particle], None], ...] = (), 
+                       own_dynamic_operation_array: tuple[Callable[[Particle], None], ...] = (), 
                        couple_dynamic_operation_array: tuple[Callable[[Particle, Particle], None], ...] = ()) -> None:
         """Iterates all particles in the space for the given steps applying them the given function/operations.
         
         Arguments:
         time_step: [s] the time step to advance each particle.
-        self_dynamic_operation_array: A tuple of functions that will be applied to each particle in the space.
+        own_dynamic_operation_array: A tuple of functions that will be applied to each particle in the space.
         couple_dynamic_operation_array: A tuple of functions that will be applied to pairs of particles in the space.
         """
         """"""
         for _ in range(numer_of_time_steps):
-            self.iterate_time_step(time_step, self_dynamic_operation_array, couple_dynamic_operation_array)
+            self.iterate_time_step(time_step, own_dynamic_operation_array, couple_dynamic_operation_array)
         print_simulation_animated(*[p.position_history for p in self])

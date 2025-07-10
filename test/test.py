@@ -1,19 +1,21 @@
 # General modules
 import numpy as np
 from icecream import ic
+from typing import Callable, Any
 
 # My modules
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 # Relative imports
-
 from functions import *
 from constants import *
 import physics as physics
 from plotting import print_simulation_animated
 
-    
+# TESTING PURPOSES
+
+
 
 # Running the file
 if __name__=="__main__":

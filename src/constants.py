@@ -12,4 +12,6 @@ TIME_STEP: float = 0.1  # How much it "tick" advance the time in the simulation 
 SIMULATION_TIME: float = 10.0  # How much the simulation last (in [s])
 NUMBER_OF_TIME_STEPS: int = int(SIMULATION_TIME / TIME_STEP)  # How many time steps will be done in the simulation
 
-X_Y_Z_FRAME_LIMIT = np.array([1, 1, 1], dtype=float)
+#X_Y_Z_FRAME_LIMIT = np.array([1, 1, 1], dtype=float)
+
+MAX_FORCE_MODULE: float = 10.0  # Maximum force module (norm) that can be applied to a particle (in [N])

@@ -11,7 +11,7 @@ from matplotlib.lines import Line2D # For type hinting in the update function
 
 from constants import *
 import utils
-
+# ---
 
 t = np.linspace(0, SIMULATION_TIME, NUMBER_OF_TIME_STEPS)
 
