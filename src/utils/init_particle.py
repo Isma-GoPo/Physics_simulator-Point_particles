@@ -12,7 +12,6 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import physics
-from constants import *
 
 def free_falling_particle(initial_position: np.ndarray | None = None) -> physics.Particle:
     """Creates a particle with mass=1, Vx=1 and with gravity field."""

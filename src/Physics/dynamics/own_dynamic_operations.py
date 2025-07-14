@@ -13,6 +13,8 @@ from typing import Callable, Any # Allow to use Callable (what means function) f
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from particle import Particle
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'utils')))
+from arrays_utils import limit_force_module
 
 
 # ---

@@ -10,7 +10,7 @@ import numpy as np
 import math
 
 # --- SIMULATION PHYSICS CONSTANTS ---
-MAX_FORCE_MODULE: float = np.inf  # Maximum force module (norm) that can be applied to a particle (in [N])
+MAX_FORCE_MODULE: float | np.ndarray = np.inf  # Maximum force module (norm) that can be applied to a particle (in [N]) `np.inf` means no limit
 
 # --- SIMULATION TIME CONSTANTS ---
 TIME_STEP: float = 0.01  # How much it "tick" advance the time in the simulation (in [s])

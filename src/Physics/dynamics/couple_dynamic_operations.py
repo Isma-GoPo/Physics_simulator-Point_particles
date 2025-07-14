@@ -27,14 +27,15 @@ def force_applier(force_func: Callable[[Particle, Particle], np.ndarray] | Any) 
     """
     @wraps(force_func)
     def wrapper_function(particle1: Particle, particle2: Particle, *args, **kwargs):
-        limited_force_funct = limit_force_module(force_func)
-        return_force: np.ndarray = limited_force_funct(particle1, particle2, *args, **kwargs)
+        # limited_force_funct = limit_force_module(force_func)
+        return_force: np.ndarray = force_func(particle1, particle2, *args, **kwargs)
         particle1.apply_force(return_force)
         particle2.apply_force(-return_force)
     return wrapper_function
 
 # Force functions
 @force_applier
+@limit_force_module
 def gravitational_force(particle1: Particle, particle2: Particle) -> np.ndarray:
     distance_vector: np.ndarray = particle2.position - particle1.position
     distance: np.floating = np.linalg.norm(distance_vector)
