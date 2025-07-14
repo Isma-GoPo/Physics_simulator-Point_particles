@@ -2,5 +2,6 @@
 
 from . import couple_dynamic_operations as couple
 from . import own_dynamic_operations as own
+from . import forces
 
-__all__ = ["couple", "own"]
+__all__ = ["forces"]

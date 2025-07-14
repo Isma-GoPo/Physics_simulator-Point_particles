@@ -1,4 +1,6 @@
-"""This module contains dynamic operations which take one particles as argument and operate on them.
+"""DEPRECATED: This module is deprecated and should not be used.
+
+This module contains dynamic operations which take one particles as argument and operate on them.
 (These operations are used in the `ParticleSpace` class to advance the simulation.)
 
 Functions:

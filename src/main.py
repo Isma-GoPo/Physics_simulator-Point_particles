@@ -27,10 +27,6 @@ if __name__=="__main__":
         particle.apply_force(np.array([-0.2, 0.0, 0.0]))
         #print(particle)
 
-    space.set_dynamic_operations(couple_dynamic_operation_array=(physics.dynamics.couple.gravitational_force, ))
+    space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.gravitational_force,))
 
     space.run_simulation(NUMBER_OF_TIME_STEPS, TIME_STEP)
-    
-    
-    
-    

@@ -1,9 +1,12 @@
-"""This module contains dynamic operations which take self or couple particles as arguments and operate on them.
+"""DEPRECATED: This module is deprecated and should not be used.
+
+This module contains dynamic operations which take self or couple particles as arguments and operate on them.
 (These operations are used in the `ParticleSpace` class to advance the simulation.)
 
 Functions:
 """
 import numpy as np
+from icecream import ic
 from functools import wraps
 from typing import Callable, Any # Allow to use Callable (what means function) for type hints (specifying the input output of the function as argument)
 
@@ -29,6 +32,7 @@ def force_applier(force_func: Callable[[Particle, Particle], np.ndarray] | Any) 
     def wrapper_function(particle1: Particle, particle2: Particle, *args, **kwargs):
         # limited_force_funct = limit_force_module(force_func)
         return_force: np.ndarray = force_func(particle1, particle2, *args, **kwargs)
+        ic("Applying force: ", return_force)
         particle1.apply_force(return_force)
         particle2.apply_force(-return_force)
     return wrapper_function
