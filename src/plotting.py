@@ -31,6 +31,10 @@ def print_simulation_animated(*particle_positions: np.ndarray) -> None:
     axis.set_xlim(np.min(x), np.max(x))
     axis.set_ylim(np.min(y), np.max(y))
 
+    # erase the axis limit
+    #axis.set_xlim(-1, 1)
+    #axis.set_ylim(-1, 1)
+
     # Initialize the line as empty so the display is empty at the start
     line, = axis.plot([], [], "o") # "o" for points ("-" for lines)
 

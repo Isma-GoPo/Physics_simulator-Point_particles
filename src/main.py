@@ -9,24 +9,11 @@ import utils
 import physics
 from plotting import print_simulation_animated
 
-def define_test_simulation_space() -> physics.ParticleSpace:
-    """Define the simulation setup with particles."""
-    space = physics.ParticleSpace()
-    space.append(utils.init.free_falling_particle())
-    space.append(utils.init.free_falling_particle(np.array([1.0, 0.0, 2.0])))
-    return space    
-
 # Running the file
 if __name__=="__main__":
-    space = utils.init.orbiting_particles()
+    #space = utils.init_space.orbiting_decelerating_particles()
+    space = utils.init_space.circular_motion_particle()
     print(space)
     #print(repr(space))
-    
-    def test_particle_function(particle: physics.Particle) -> None:
-        """A test function to apply to each particle."""
-        particle.apply_force(np.array([-0.2, 0.0, 0.0]))
-        #print(particle)
 
-    space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.gravitational_force,))
-
-    space.run_simulation(NUMBER_OF_TIME_STEPS, TIME_STEP)
+    space.run_simulation(NUMBER_OF_TIME_STEPS, TIME_STEP) 

@@ -35,9 +35,9 @@ class ParticleSpace(list):
         return self._couple_forces_array
     
     def set_forces_to_apply(self, /, 
-                                          single_forces_array: tuple[Callable[[Particle], np.ndarray], ...] | None = None,
-                                          couple_forces_array: tuple[Callable[[Particle, Particle], np.ndarray], ...] | None = None
-                                          ) -> None:
+                            single_forces_array: tuple[Callable[[Particle], np.ndarray], ...] | None = None,
+                            couple_forces_array: tuple[Callable[[Particle, Particle], np.ndarray], ...] | None = None
+                            ) -> None:
         """Set the tuple of functions that operate on individual particles.
         
         Keyword Arguments:
@@ -50,6 +50,11 @@ class ParticleSpace(list):
         if couple_forces_array is not None:
             # If couple_forces_array is not None, set it. Otherwise, keep the existing value
             self._couple_forces_array = couple_forces_array
+
+    @property
+    def position_history_array(self) -> tuple[np.ndarray, ...]:
+        """Return a tuple of position history arrays for each particle in the space."""
+        return tuple(p.position_history for p in self)
 
     # --- METHODS ---
 
@@ -128,4 +133,4 @@ class ParticleSpace(list):
         """
         for _ in range(numer_of_time_steps):
             self.iterate_time_step(time_step, single_forces_array, couple_forces_array)
-        print_simulation_animated(*[p.position_history for p in self])
+        print_simulation_animated(*self.position_history_array)
