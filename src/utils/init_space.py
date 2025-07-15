@@ -40,6 +40,27 @@ def circular_motion_particle(initial_position: np.ndarray | None = None) -> phys
     initial_velocity = np.array([1, 0.0, 0.0])  # Perpendicular to the position vector for circular orbit
     space = physics.ParticleSpace()
     space.append(physics.Particle(1.0, initial_position=initial_position, 
+                                  initial_velocity = initial_velocity))
+    space.set_forces_to_apply(single_forces_array=( partial(physics.dynamics.forces.cinematic_cross_velocity_force, field_vector=np.array([0.0, -1.0, 0.0])), ))
+    return space
+
+def circular_motion_decelerating_particle(initial_position: np.ndarray | None = None) -> physics.ParticleSpace:
+    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
+    initial_position = initial_position if initial_position is not None else np.array([0.0, 0.0, 1.])
+    initial_velocity = np.array([1, 0.0, 0.0])  # Perpendicular to the position vector for circular orbit
+    space = physics.ParticleSpace()
+    space.append(physics.Particle(1.0, initial_position=initial_position, 
+                                  initial_velocity = initial_velocity))
+    space.set_forces_to_apply(single_forces_array=( partial(physics.dynamics.forces.cinematic_cross_velocity_force, field_vector=np.array([0.0, -1.0, 0.0])), 
+                                                   partial(physics.dynamics.forces.viscosity_force,viscosity_constant=0.1)))
+    return space
+
+def circular_motion_accelerated_particle(initial_position: np.ndarray | None = None) -> physics.ParticleSpace:
+    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
+    initial_position = initial_position if initial_position is not None else np.array([0.0, 0.0, 1.])
+    initial_velocity = np.array([1, 0.0, 0.0])  # Perpendicular to the position vector for circular orbit
+    space = physics.ParticleSpace()
+    space.append(physics.Particle(1.0, initial_position=initial_position, 
                                   initial_velocity = initial_velocity, 
                                   acceleration_field=np.array([0.0, 0.0, -0.2])))
     space.set_forces_to_apply(single_forces_array=( partial(physics.dynamics.forces.cinematic_cross_velocity_force, field_vector=np.array([0.0, -1.0, 0.0])), ))

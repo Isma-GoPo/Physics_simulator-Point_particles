@@ -8,8 +8,8 @@ from .particle import Particle
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from plotting import print_simulation_animated
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#from plotting import print_simulation_animated
 
 class ParticleSpace(list):
     """A class for managing a space containing multiple particles. Inherits from list."""
@@ -72,6 +72,10 @@ class ParticleSpace(list):
         """Add a particle to the space."""
         self.append(particle)
 
+    def reduced_position_history_array(self, steps_relation: int = 1) -> tuple[np.ndarray, ...]:
+        return tuple(p.position_history[::steps_relation] for p in self)
+
+
     def advance_time_step(self, time_step: float= 1.) -> None:
         """Advance all particles in the space by a given time step."""
         for particle in self:
@@ -133,4 +137,3 @@ class ParticleSpace(list):
         """
         for _ in range(numer_of_time_steps):
             self.iterate_time_step(time_step, single_forces_array, couple_forces_array)
-        print_simulation_animated(*self.position_history_array)
