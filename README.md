@@ -1,6 +1,10 @@
 ## Project Description
 This is a learning physics programm that simulates the dynamics of puntual charges in a space, using Newton and gravity/Coulomb equations for calculating forces and then basic cinematic equation for tracing the trajectories.
 
+- For reading the path taken read [Changelog](./docs/changelog.md)
+- For reading the path to take read [Roadmap](./docs/roadmap.md)
+
+
 ## Python used libraries / functions
 The programm would be using 
 - Numpy for the numbers and calculations.

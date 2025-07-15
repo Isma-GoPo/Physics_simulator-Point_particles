@@ -46,5 +46,3 @@ def gravitational_force(particle1: Particle, particle2: Particle) -> np.ndarray:
     force_module: np.floating = (particle1.mass * particle2.mass) / distance**2
     force_direction: np.ndarray = distance_vector / distance if distance != 0 else np.zeros(3)
     return force_module * force_direction
-
-# ??? `gravitational_force.__wrapped__` for original (non-wraped) `gravitational_force` (returns the force vector)
