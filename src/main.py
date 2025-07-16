@@ -16,7 +16,6 @@ from plotting import print_animated_poistion_by_array, print_animated_simulation
 
 # Running the file
 if __name__=="__main__":
-    ic(SETTINGS)
     #space = utils.init_space.orbiting_decelerating_particles()
     space = utils.init_space.circular_motion_decelerating_particle()
 

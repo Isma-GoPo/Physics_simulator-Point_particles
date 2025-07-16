@@ -14,4 +14,4 @@ from .dynamics import *
 
 # from . import linearalgebra
 
-__all__ = ["Particle", "physics_constants", "own", "couple", "ParticleSpace"]
+__all__ = ["Particle", "ParticleSpace", "physics_constants", "forces"]

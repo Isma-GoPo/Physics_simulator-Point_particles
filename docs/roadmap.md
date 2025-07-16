@@ -1,13 +1,6 @@
 # Roadmap
 This is the roadmap of this repository. The features I want to be adding in a future.
 
-## Better plotting
-- Make position_history only return the array you want (faster)
-- refactor plotting function into more
-
-## configration settings
-- add a `settings.yaml` file that is used for definnig the simulation constants, etc. 
-
 ## More functions and init spaces
 - Add solar system init
 - Add more functions
@@ -15,7 +8,6 @@ This is the roadmap of this repository. The features I want to be adding in a fu
 ### Live time span
 - Add to Particle its `live time span`
   - This allow time-depending functionsw
-
 
 ## Charge particle
 - Add a Particle subClass with charge

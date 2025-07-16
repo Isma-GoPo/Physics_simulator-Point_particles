@@ -1,5 +1,10 @@
 This is the log file. Its purpose is to have an idea of what I have done when I enter the project a long time later.
 
+## v0.4 [2025-07-16]
+Organaising repo: adding roadmap, license; deleting unused modules and __pycache__.
+Added functional setting.yalm for configuring the simulation and plotting
+
+
 ## v0.3 [2025-07-14]
 ###### Summary
 Better physics package with ParticleSpace class, dynamic>force functions, and quick default space initializers
