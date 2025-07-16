@@ -104,7 +104,7 @@ class Particle:
         Keyword arguments:
         applied_force: [N] a 3D numpy array for the force in x, y, z
         """
-        self.acceleration += applied_force / self.mass
+        self.apply_acceleration( applied_force / self.mass)
 
     def apply_acceleration(self, applied_acceleration: np.ndarray) -> None:
         """Applies an acceleration to the particle, updating its acceleration.

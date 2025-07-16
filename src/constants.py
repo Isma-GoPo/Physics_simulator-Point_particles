@@ -7,8 +7,6 @@ NUMBER_OF_TIME_STEPS: [int] number time steps will be done in the simulation
 """
 import numpy as np
 import math
-import yaml
-from typing import Any
 from icecream import ic
 
 # My modules
@@ -25,6 +23,7 @@ TIME_STEP: float | np.float64 = np.float64( SETTINGS["simulation"]["time_step"] 
 SIMULATION_TIME: float | np.float64 = np.float64( SETTINGS["simulation"]["simulation_time"] )
     # How much the simulation last (in [s])
 NUMBER_OF_TIME_STEPS: int = int(SIMULATION_TIME / TIME_STEP)  
+if NUMBER_OF_TIME_STEPS > 100_000: raise Exception("Too many time steps could crash")
     # How many time steps will be done in the simulation
 
 # --- PLOTTING CONSTANTS ---

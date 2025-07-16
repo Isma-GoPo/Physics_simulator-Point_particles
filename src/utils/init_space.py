@@ -12,6 +12,27 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import physics
 
+
+def solar_system() -> physics.ParticleSpace:
+    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
+    solar_system_data=[[1.989e30, 0.0, 0.0], #sun
+                       [3.285e23, 47e9, 58.97e3], #mercury
+                       [4.87e24, 107.48e9, 36.259e3], #venus
+                       [5.972e24, 147.098e9, 30.29e3], #earth
+                       [6.4169e23, 206.62e9, 26.50e3], #mars
+                       [7.342e22, 147.098e9+363e6, 30.29e3+1.082e3], #moon
+                      ]
+
+    space = physics.ParticleSpace()
+    for mass, x, v in solar_system_data:
+        space.append(physics.Particle(mass, 
+            initial_position=np.array([x, 0.0, 0.0]), 
+            initial_velocity = np.array([0.0, 0.0, v])))
+
+    space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.gravitational_force,),
+                              single_forces_array=())
+    return space
+
 def orbiting_particles(initial_position: np.ndarray | None = None) -> physics.ParticleSpace:
     """Creates a particle space with mass=1, Vx=1 and with gravity field."""
     initial_position = initial_position if initial_position is not None else np.array([0.0, 0.0, 1.])

@@ -1,7 +1,7 @@
 simulation:
-  simulation_time: 40    # in secs
-  time_step: 0.01
-  max_allowed_force: 10
+  simulation_time: 3.156e+7    # in secs
+  time_step: 864
+  #max_allowed_force: 10
   # max_velocity_diff: meassure the adapatative accuracy (tbd)
 plotting: 
   plotting_time: 10

@@ -1,6 +1,7 @@
 import yaml
 from typing import Any
 from icecream import ic
+import numpy as np
 
 
 def merge_dicts(default: dict, overrider: dict) -> dict:
@@ -32,7 +33,7 @@ default_settings = {
     "simulation": {
         "simulation_time": 40,
         "time_step": 0.01,
-        "max_allowed_force": 100,
+        "max_allowed_force": np.inf,
     },
     "plotting": {
         "plotting_time": 10,
