@@ -5,6 +5,9 @@ This is the roadmap of this repository. The features I want to be adding in a fu
 - Make position_history only return the array you want (faster)
 - refactor plotting function into more
 
+## configration settings
+- add a `settings.yaml` file that is used for definnig the simulation constants, etc. 
+
 ## More functions and init spaces
 - Add solar system init
 - Add more functions
