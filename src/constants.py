@@ -30,6 +30,13 @@ if NUMBER_OF_TIME_STEPS > 100_000: raise Exception("Too many time steps could cr
 PLOTTING_TIME: float | np.float64 = np.float64( SETTINGS["plotting"]["plotting_time"] )
     # How much the plotting of the simulation last (in [s])
 
+
+PLOTTING_SIZE_MIN: float | np.float64 = np.float64( SETTINGS["plotting"]["dot_sizes"]["min"] )
+PLOTTING_SIZE_MAX: float | np.float64 = np.float64( SETTINGS["plotting"]["dot_sizes"]["max"] )
+PLOTTING_SIZE_DIFFERENCE: float | np.float64 = np.float64( SETTINGS["plotting"]["dot_sizes"]["size_difference"] )
+PLOTTING_SIZE_PER_DIFFERENCE: float | np.float64 = (PLOTTING_SIZE_MAX - PLOTTING_SIZE_MIN)/PLOTTING_SIZE_DIFFERENCE
+PLOTTING_SIZE_EXPONENT_FACTOR: float | np.float64 = np.float64( SETTINGS["plotting"]["dot_sizes"]["exponent_factor"] )
+
 #X_Y_Z_FRAME_LIMIT = np.array([1, 1, 1], dtype=float)
 PLOTTING_STEPS_PER_SECOND: int = int(SETTINGS["plotting"]["refresh_rate"])
     # Recommended to make it so it plots 30 step every second

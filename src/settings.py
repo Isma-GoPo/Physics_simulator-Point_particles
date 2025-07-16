@@ -38,14 +38,15 @@ default_settings = {
     "plotting": {
         "plotting_time": 10,
         "refresh_rate": 20,
-        "do_repeat": False
+        "do_repeat": False,
         # max_velocity_diff:
-    },
-    "test": {
-        "test": {
-            "test": 1
+        "dot_sizes": {
+            "min": 15,
+            "max": 75,
+            "size_difference": 6,
+            "exponent_factor": 0.666
         }
-    }
+    },
 }
 
 SETTINGS: dict[str, Any] = merge_dicts(default_settings, user_settings)

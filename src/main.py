@@ -11,7 +11,8 @@ from constants import *
 import utils
 from time import perf_counter
 import physics
-from plotting import print_animated_poistion_by_array, print_animated_simulation_by_space
+#from plotting import print_animated_poistion_by_array, print_animated_simulation_by_space
+from space_plotting import print_animated_simulation_by_space, get_dot_size_list
 
 
 # Running the file
@@ -24,5 +25,6 @@ if __name__=="__main__":
     ic(physics.dynamics.forces.gravitational_force(space[0], space[1]))
     #ic(str(space[1]))
     ic(physics.dynamics.forces.gravitational_force(space[0], space[1]))
+    ic(get_dot_size_list(space))
     
     print_animated_simulation_by_space(space)

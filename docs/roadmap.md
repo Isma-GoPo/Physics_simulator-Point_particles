@@ -2,7 +2,6 @@
 This is the roadmap of this repository. The features I want to be adding in a future.
 
 ## More functions and init spaces
-- Add solar system init
 - Add more functions
 
 ### Live time span

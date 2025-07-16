@@ -1,6 +1,7 @@
 """`particle` module include the `Particle` class"""
 
 import numpy as np
+from plotting.dot import PlottingDot
 
 class Particle:
     def __init__(self, mass: float, 
@@ -8,7 +9,8 @@ class Particle:
                  initial_velocity: np.ndarray | None = None, 
                  initial_acceleration: np.ndarray | None = None,
                  *,
-                 acceleration_field: np.ndarray | None = None
+                 acceleration_field: np.ndarray | None = None,
+                 plotting_dot: PlottingDot | None = None,
                  ) -> None:
         """Init a 'Particle' object
 
@@ -34,6 +36,10 @@ class Particle:
         self._last_velocity = np.zeros(3)
         self._last_acceleration = np.zeros(3)
         self._position_history = np.empty((0, 3), float)
+
+        self.plotting = plotting_dot if plotting_dot is not None else PlottingDot(weight=self.mass)
+
+    # --- PROPERTIES ---
 
     @property
     def last_velocity(self) -> np.ndarray:
