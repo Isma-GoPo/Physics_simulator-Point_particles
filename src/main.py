@@ -22,9 +22,6 @@ if __name__=="__main__":
 
     space.run_simulation(NUMBER_OF_TIME_STEPS, TIME_STEP)
 
-    ic(physics.dynamics.forces.gravitational_force(space[0], space[1]))
-    #ic(str(space[1]))
-    ic(physics.dynamics.forces.gravitational_force(space[0], space[1]))
-    ic(get_dot_size_list(space))
+    ic(space[0])
     
     print_animated_simulation_by_space(space)

@@ -36,6 +36,7 @@ class Particle:
         self._last_velocity = np.zeros(3)
         self._last_acceleration = np.zeros(3)
         self._position_history = np.empty((0, 3), float)
+        self._life_time = 0.0
 
         self.plotting = plotting_dot if plotting_dot is not None else PlottingDot(weight=self.mass)
 
@@ -43,18 +44,25 @@ class Particle:
 
     @property
     def last_velocity(self) -> np.ndarray:
-        """Read-only access to the position history."""
+        """Read-only access to the last step velocity of the particle."""
         return self._last_velocity.copy()
 
     @property
     def last_acceleration(self) -> np.ndarray:
-        """Read-only access to the position history."""
+        """Read-only access to the last step acceleration of the particle."""
         return self._last_acceleration.copy()
 
     @property
     def position_history(self) -> np.ndarray:
         """Read-only access to the position history."""
         return self._position_history.copy()
+
+    @property
+    def life_time(self) -> float:
+        """Read-only access to the life the particle have lived."""
+        return self._life_time
+    
+    # --- METHODS ---
     
     def __str__(self) -> str:
         class_name = self.__class__.__name__
@@ -141,6 +149,7 @@ class Particle:
         self.do_accelerate(time_step)
         self.do_translate(time_step)
         self.store_current_state()
+        self._life_time += time_step
 
 if __name__=="__main__":
     gravity = np.array([0.0, 0.0, -9.81])  # Gravity vector in m/s^2 

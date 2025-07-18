@@ -21,6 +21,7 @@ class ParticleSpace(list):
         super().__init__(particles)
         self._single_forces_array = single_forces_array if single_forces_array is not None else ()
         self._couple_forces_array = couple_forces_array if couple_forces_array is not None else ()
+        self._life_time = 0.0
 
     # --- PROPERTIES ---
     
@@ -55,6 +56,11 @@ class ParticleSpace(list):
     def position_history_array(self) -> tuple[np.ndarray, ...]:
         """Return a tuple of position history arrays for each particle in the space."""
         return tuple(p.position_history for p in self)
+    
+    @property
+    def life_time(self) -> float:
+        """Read-only access to the life the particle have lived."""
+        return self._life_time
 
     # --- METHODS ---
 
@@ -76,7 +82,7 @@ class ParticleSpace(list):
         return tuple(p.position_history[::steps_relation] for p in self)
 
 
-    def advance_time_step(self, time_step: float= 1.) -> None:
+    def advance_particles_time_step(self, time_step: float= 1.) -> None:
         """Advance all particles in the space by a given time step."""
         for particle in self:
             particle.advance_time_step(time_step)
@@ -118,7 +124,8 @@ class ParticleSpace(list):
         # Apply couple operations to each pair of particles
         self.apply_couple_forces_array(couple_forces_array)
         
-        self.advance_time_step(time_step)
+        self.advance_particles_time_step(time_step)
+        self._life_time += time_step
 
 
     def run_simulation(self, 
