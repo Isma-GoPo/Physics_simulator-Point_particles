@@ -24,7 +24,6 @@ def get_dot_size_list(particle_space) -> list[float]:
     sizes = np.array([particle.plotting.size for particle in particle_space])
     exp = constants.PLOTTING_SIZE_EXPONENT_FACTOR
     geometric_size = relativise_size(sizes)**exp * constants.PLOTTING_SIZE_DIFFERENCE**(1-exp) # Make something similar to the geometric mean (because area != proprotional mass)
-    ic(sizes)
     return list(geometric_size*constants.PLOTTING_SIZE_PER_DIFFERENCE+constants.PLOTTING_SIZE_MIN)
 
 def relativise_size(sizes: np.ndarray) -> np.ndarray:

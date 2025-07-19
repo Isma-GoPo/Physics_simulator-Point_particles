@@ -16,12 +16,16 @@ class ParticleSpace(list):
     def __init__(self, 
                  *particles: tuple[Particle], 
                  single_forces_array: tuple[Callable[[Particle], np.ndarray], ...] | None = None,
-                 couple_forces_array: tuple[Callable[[Particle, Particle], np.ndarray], ...] | None = None
+                 couple_forces_array: tuple[Callable[[Particle, Particle], np.ndarray], ...] | None = None,
+                 is_adaptative_ok: bool = False,
+                 adaptative_max_velocity_diff: float | np.floating = np.inf,
                  ) -> None:
         super().__init__(particles)
         self._single_forces_array = single_forces_array if single_forces_array is not None else ()
         self._couple_forces_array = couple_forces_array if couple_forces_array is not None else ()
         self._life_time = 0.0
+        self.is_adaptative: bool = is_adaptative_ok
+        self.adaptative_max_velocity_diff: float | np.floating = adaptative_max_velocity_diff
 
     # --- PROPERTIES ---
     
@@ -56,13 +60,15 @@ class ParticleSpace(list):
     def position_history_array(self) -> tuple[np.ndarray, ...]:
         """Return a tuple of position history arrays for each particle in the space."""
         return tuple(p.position_history for p in self)
-    
+
     @property
     def life_time(self) -> float:
         """Read-only access to the life the particle have lived."""
         return self._life_time
 
     # --- METHODS ---
+
+    # --- RETURNING METHODS ---
 
     def __str__(self) -> str:
         class_name = self.__class__.__name__
@@ -78,9 +84,18 @@ class ParticleSpace(list):
         """Add a particle to the space."""
         self.append(particle)
 
-    def reduced_position_history_array(self, steps_relation: int = 1) -> tuple[np.ndarray, ...]:
-        return tuple(p.position_history[::steps_relation] for p in self)
+    def get_particle_property_array(self, property_name: str) -> tuple[np.ndarray, ...]:
+        """Return a tuple of arrays for the given property of each particle in the space."""
+        return tuple(getattr(particle, property_name) for particle in self)
 
+    def reduced_position_history_array(self, steps_relation: int = 1) -> tuple[np.ndarray, ...]:
+        return tuple(particle.position_history[::steps_relation] for particle in self)
+    
+    def is_adaptative_ok(self, time_step: float, max_velocity_diff: float | np.floating) -> bool:
+        """Return wheter the  tuple of the velocity difference arrays for each particle in the space."""
+        return all((particle.is_adaptative_ok(time_step, max_velocity_diff) for particle in self))
+
+    # --- OPERATING METHODS ---
 
     def advance_particles_time_step(self, time_step: float= 1.) -> None:
         """Advance all particles in the space by a given time step."""
@@ -124,6 +139,9 @@ class ParticleSpace(list):
         # Apply couple operations to each pair of particles
         self.apply_couple_forces_array(couple_forces_array)
         
+        ic(self.is_adaptative_ok(time_step, max_velocity_diff=self.adaptative_max_velocity_diff))
+        #ic([particle.velocity_differential(time_step) for particle in self])
+        #ic(np.max(np.array([particle.velocity_differential(time_step) for particle in self])))
         self.advance_particles_time_step(time_step)
         self._life_time += time_step
 

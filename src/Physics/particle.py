@@ -1,6 +1,9 @@
 """`particle` module include the `Particle` class"""
 
 import numpy as np
+
+import os, sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from plotting.dot import PlottingDot
 
 class Particle:
@@ -67,12 +70,9 @@ class Particle:
         """Read-only access to the position history."""
         return self._position_history.copy()
     
-    @property
-    def velocity_difference(self, time_step: float = 1.0) -> np.floating:
-        return np.linalg.norm(self.acceleration_to_apply) * time_step
-    
     # --- METHODS ---
     
+    # --- RETURNING METHODS ---
     def __str__(self) -> str:
         class_name = self.__class__.__name__
         attributes = '\n'.join(f"  {key}: {value}" for key, value in self.__dict__.items())
@@ -82,6 +82,15 @@ class Particle:
         class_name = self.__class__.__name__
         attributes = ', '.join(f"{key} = {repr(value)}" for key, value in self.__dict__.items())
         return f"{class_name}({attributes})"
+    
+    def velocity_differential(self, time_step: float = 1.0) -> float:
+        return float( np.linalg.norm(self.acceleration_to_apply) * time_step )
+    
+    def is_adaptative_ok(self, time_step: float, max_velocity_diff: float | np.floating) -> bool:
+        """Return wheter the  tuple of the velocity difference arrays for each particle in the space."""
+        return self.velocity_differential(time_step) < float(max_velocity_diff)
+    
+    # --- OPERATING METHODS ---
 
     def do_translate(self, time_step: float = 1.0, forced_velocity: np.ndarray | None = None) -> None:
         """Translate (move) the position of the particle according to the velocity (inner or given) during the given time step.
@@ -151,14 +160,3 @@ class Particle:
         self.do_translate(time_step)
         self.store_current_state()
         self._life_time += time_step
-
-if __name__=="__main__":
-    gravity = np.array([0.0, 0.0, -9.81])  # Gravity vector in m/s^2 
-    # make it a constant!!!
-    # Make that it is always in the store_current_state() (it always applies gravity)
-    particle = Particle(1.0, acceleration_field = gravity)
-    print(particle)
-    particle.advance_time_step(1.0)  # Advance one second
-    print(particle)
-    particle.advance_time_step(1.0)  # Advance another second   
-    print(particle)
