@@ -102,42 +102,33 @@ class ParticleSpace(list):
         for particle in self:
             particle.advance_time_step(time_step)
 
-    def apply_single_forces_array(self, 
-                                  single_forces_array: tuple[Callable[[Particle], np.ndarray], ...] = (),
-                                  ) -> None:
-        """Apply the forces (self ones and passed) to each particle in the space individually."""
+    def apply_single_forces_array(self) -> None:
+        """Apply the forces (in self) to each particle in the space individually."""
         for particle in self:
-            for force in self._single_forces_array + single_forces_array:
+            for force in self._single_forces_array:
                 particle.apply_force(force(particle))
     
-    def apply_couple_forces_array(self,
-                                  couple_forces_array: tuple[Callable[[Particle, Particle], np.ndarray], ...] = (),
-                                  ) -> None:
-        """Apply the forces (self ones and passed) to each pair of particles in the space."""
+    def apply_couple_forces_array(self) -> None:
+        """Apply the forces (in self) to each pair of particles in the space."""
         for i, particle1 in enumerate(self):
             
             for particle2 in self[i+1:]:
-                for force in self._couple_forces_array + couple_forces_array:
+                for force in self._couple_forces_array:
                     force_to_apply: np.ndarray = force(particle1, particle2)
                     particle1.apply_force(force_to_apply)
                     particle2.apply_force(-force_to_apply)
 
-    def iterate_time_step(self, time_step: float = 1., 
-                          single_forces_array: tuple[Callable[[Particle], np.ndarray], ...] = (), 
-                          couple_forces_array: tuple[Callable[[Particle, Particle], np.ndarray], ...] = ()
-                          ) -> None:
+    def iterate_time_step(self, time_step: float = 1.) -> None:
         """Advance all particles in the space for the given steps operating with the given functions.
         
         Arguments:
         time_step: [s] the time step to advance each particle.
-        single_forces_array: A tuple of functions that will be applied to each particle in the space individually.
-        couple_forces_array: A tuple of functions that will be applied to each pair of particles in the space.
         """
         # Apply self operations to each particle
-        self.apply_single_forces_array(single_forces_array)
+        self.apply_single_forces_array()
         
         # Apply couple operations to each pair of particles
-        self.apply_couple_forces_array(couple_forces_array)
+        self.apply_couple_forces_array()
         
         ic(self.is_adaptative_ok(time_step, max_velocity_diff=self.adaptative_max_velocity_diff))
         #ic([particle.velocity_differential(time_step) for particle in self])
@@ -148,17 +139,12 @@ class ParticleSpace(list):
 
     def run_simulation(self, 
                        numer_of_time_steps: int, 
-                       time_step: float = 1.,
-                       single_forces_array: tuple[Callable[[Particle], np.ndarray], ...] = (), 
-                       couple_forces_array: tuple[Callable[[Particle, Particle], np.ndarray], ...] = ()) -> None:
+                       time_step: float = 1.) -> None:
         """Iterates all particles in the space for the given steps applying them the given function/operations.
         
         Arguments:
         numer_of_time_steps: [s] the number of time steps to advance each particle.
         time_step: [s] the time step to advance each particle.
-        single_forces_array: A tuple of functions that will be applied to each particle in the space individually.
-        couple_forces_array: A tuple of functions that will be applied to each pair of particles in the space.
-          Better if they are set in `self.set_forces_to_apply()` (the default).
         """
         for _ in range(numer_of_time_steps):
-            self.iterate_time_step(time_step, single_forces_array, couple_forces_array)
+            self.iterate_time_step(time_step)
