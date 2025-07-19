@@ -53,14 +53,23 @@ class Particle:
         return self._last_acceleration.copy()
 
     @property
+    def velocity_to_apply(self) -> np.ndarray:
+        """Returns the velocity of the particle that should have when translating the particle positions"""
+        return (self.velocity + self.last_velocity) / 2
+    
+    @property
+    def acceleration_to_apply(self) -> np.ndarray:
+        """Returns the acceleration of the particle that should have when translating the particle positions"""
+        return self.acceleration #(self.acceleration + self.last_acceleration) / 2
+
+    @property
     def position_history(self) -> np.ndarray:
         """Read-only access to the position history."""
         return self._position_history.copy()
-
+    
     @property
-    def life_time(self) -> float:
-        """Read-only access to the life the particle have lived."""
-        return self._life_time
+    def velocity_difference(self, time_step: float = 1.0) -> np.floating:
+        return np.linalg.norm(self.acceleration_to_apply) * time_step
     
     # --- METHODS ---
     
@@ -74,14 +83,6 @@ class Particle:
         attributes = ', '.join(f"{key} = {repr(value)}" for key, value in self.__dict__.items())
         return f"{class_name}({attributes})"
 
-    def velocity_to_apply(self) -> np.ndarray:
-        """Returns the velocity of the particle that should have when translating the particle positions"""
-        return (self.velocity + self.last_velocity) / 2
-    
-    def acceleration_to_apply(self) -> np.ndarray:
-        """Returns the acceleration of the particle that should have when translating the particle positions"""
-        return self.acceleration #(self.acceleration + self.last_acceleration) / 2
-
     def do_translate(self, time_step: float = 1.0, forced_velocity: np.ndarray | None = None) -> None:
         """Translate (move) the position of the particle according to the velocity (inner or given) during the given time step.
 
@@ -91,7 +92,7 @@ class Particle:
           If no velocity is given, it takes the velocity of the object
         """
         if forced_velocity is None:
-            velocity = self.velocity_to_apply()
+            velocity = self.velocity_to_apply
         else:
             velocity = forced_velocity
         
@@ -106,7 +107,7 @@ class Particle:
           If no acceleration is given, it takes the acceleration of the object
         """
         if forced_acceleration is None:
-            acceleration = self.acceleration_to_apply()
+            acceleration = self.acceleration_to_apply
         else:
             acceleration = forced_acceleration
         
