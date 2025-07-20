@@ -34,6 +34,8 @@ default_settings = {
         "simulation_time": 40,
         "time_step": 0.01,
         "max_allowed_force": np.inf,
+        "is_adaptative": True,
+        "max_velocity_diff": 100, # meassure the adapatative accuracy
     },
     "plotting": {
         "plotting_time": 10,

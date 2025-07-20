@@ -26,6 +26,13 @@ NUMBER_OF_TIME_STEPS: int = int(SIMULATION_TIME / TIME_STEP)
 if NUMBER_OF_TIME_STEPS > 100_000: raise Exception("Too many time steps could crash")
     # How many time steps will be done in the simulation
 
+# --- ADPATATIVE SIMULATION ---
+IS_ADPATATIVE: bool = bool( SETTINGS["simulation"]["is_adaptative"] )
+    # If True, the simulation will be adaptative
+ADPATATIVE_MAX_VELOCITY_DIFF: float | np.float64 = np.float64( SETTINGS["simulation"]["max_velocity_diff"] )
+    # defines the the adapatative accuracy
+
+
 # --- PLOTTING CONSTANTS ---
 PLOTTING_TIME: float | np.float64 = np.float64( SETTINGS["plotting"]["plotting_time"] )
     # How much the plotting of the simulation last (in [s])
