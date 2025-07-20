@@ -7,7 +7,9 @@ class NestedHash():
     A class to transform a dictionary (including nested dictionaries) into an object where keys are accessible as attributes
     Nested dictionaries are managed recursevely (as NestedHash functions).
     """
-    def __init__(self, dictionary: dict[str, Any], overwritter_dict: dict[str, Any] | None = None) -> None:
+    def __init__(self, 
+                 dictionary: dict[str, Any] | None = None, 
+                 overwritter_dict: dict[str, Any] | None = None) -> None:
         """
         Initialize the NestedHash object with a dictionary, overwritten the atributes given in over overwritter_dict
 
@@ -15,6 +17,7 @@ class NestedHash():
         - dictionary: the base dictionary for initialization
         - overwritter_dict: an optional dictionary that will overwritte the NestedHash atributes calling the update method
         """
+        dictionary = {} if dictionary is None else dictionary
         cls = self.__class__
         for key, value in dictionary.items():
             key = cls._sanitase_key(key)
@@ -59,6 +62,9 @@ class NestedHash():
         if isinstance(new_value, dict):
             return super().__setattr__(key, cls(new_value))
         return super().__setattr__(key, new_value)
+    
+    def __delattr__(self, key: str) -> None:
+        getattr(self, key)
         
     def __getitem__(self, key: str) -> dict[str, Any]:
         """getitem but allowing accessing nested keys by dot notation.
@@ -118,5 +124,5 @@ if __name__ == "__main__":
     obj = NestedHash({"simulation_time": 40, "time": {"life": {"first": 3.2, "second": 2}, "death": 28}})
     print(repr(obj))
     obj.update({"time": {"life": {"first": 1}}})
-    print(obj.as_dictionary)
-    print(obj["time.life.second"])
+    print(obj.a) # type: ignore
+    print(obj["timelife.second"])
