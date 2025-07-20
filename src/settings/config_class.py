@@ -2,6 +2,7 @@
 
 from types import SimpleNamespace
 from typing import Any
+from copy import copy as python_copy
 
 class Config(SimpleNamespace):
     """
@@ -17,7 +18,7 @@ class Config(SimpleNamespace):
         overwritter_dict: an optional dictionary that will overwritte the Config atributes calling the update method
         """
         processed_dict = Config._processed_dict(dictionary)
-        super().__init__(**processed_dict)
+        super().__init__(**processed_dict)    # SimpleNamespace allow having the keys as object atributes 
         if overwritter_dict is not None:
             self.update(overwritter_dict)
 
@@ -54,6 +55,21 @@ class Config(SimpleNamespace):
             return super().__setattr__(key, Config(new_value))
         return super().__setattr__(key, new_value)
     
+    def get(self, key: str, *nested_keys: str) -> Any:
+        try:
+            if len(nested_keys) == 0:
+                return getattr(self, key)
+            elif len(nested_keys) >= 1:
+                return getattr(self, key).access_from_key(*nested_keys)
+        except:
+            return None
+        
+    def __getitem__(self, key: str) -> Any:
+        return getattr(self, key)
+    
+    def copy(self):
+        return Config(self.as_dictionary)
+    
     def update(self, new_dictionary: dict[str, Any]) -> None:
         """Update the object with a new dictionary. 
         If the value to overweite is a Config, it recursevely update it.
@@ -78,4 +94,4 @@ if __name__ == "__main__":
     obj = Config({"simulation_time": 40, "time": {"life": {"first": 1, "second": 2}, "death": 28}})
     print(obj)
     obj.update({"time": {"life": "AA"}})
-    print(obj)
+    print(obj.get("time"))

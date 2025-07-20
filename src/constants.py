@@ -8,53 +8,33 @@ Constants:
 import numpy as np
 import math
 from icecream import ic
+from typing import Any
+
 
 
 # My modules
-from settings.settings import SETTINGS
 
 SETTING_FILE_PATH: str = r"src\settings.yaml"
 
-# --- SIMULATION PHYSICS CONSTANTS ---
-MAX_FORCE_MODULE: float | np.float64 = np.float64( SETTINGS["simulation"]["max_allowed_force"] )
-    # Maximum force module (norm) that can be applied to a particle (in [N]) `np.inf` means no limit
-
-# --- SIMULATION TIME CONSTANTS ---
-TIME_STEP: float | np.float64 = np.float64( SETTINGS["simulation"]["time_step"] )
-    # How much it "tick" advance the time in the simulation (in [s])
-    # 0.001 slow but really accurate
-SIMULATION_TIME: float | np.float64 = np.float64( SETTINGS["simulation"]["simulation_time"] )
-    # How much the simulation last (in [s])
-NUMBER_OF_TIME_STEPS: int = int(SIMULATION_TIME / TIME_STEP)  
-if NUMBER_OF_TIME_STEPS > 100_000: raise Exception("Too many time steps could crash")
-    # How many time steps will be done in the simulation
-
-# --- ADPATATIVE SIMULATION ---
-IS_ADPATATIVE: bool = bool( SETTINGS["simulation"]["is_adaptative"] )
-    # If True, the simulation will be adaptative
-ADPATATIVE_MAX_VELOCITY_DIFF: float | np.float64 = np.float64( SETTINGS["simulation"]["max_velocity_diff"] )
-    # defines the the adapatative accuracy
-
-
-# --- PLOTTING CONSTANTS ---
-PLOTTING_TIME: float | np.float64 = np.float64( SETTINGS["plotting"]["plotting_time"] )
-    # How much the plotting of the simulation last (in [s])
-
-
-PLOTTING_SIZE_MIN: float | np.float64 = np.float64( SETTINGS["plotting"]["dot_sizes"]["min"] )
-PLOTTING_SIZE_MAX: float | np.float64 = np.float64( SETTINGS["plotting"]["dot_sizes"]["max"] )
-PLOTTING_SIZE_DIFFERENCE: float | np.float64 = np.float64( SETTINGS["plotting"]["dot_sizes"]["size_difference"] )
-PLOTTING_SIZE_PER_DIFFERENCE: float | np.float64 = (PLOTTING_SIZE_MAX - PLOTTING_SIZE_MIN)/PLOTTING_SIZE_DIFFERENCE
-PLOTTING_SIZE_EXPONENT_FACTOR: float | np.float64 = np.float64( SETTINGS["plotting"]["dot_sizes"]["exponent_factor"] )
-
-#X_Y_Z_FRAME_LIMIT = np.array([1, 1, 1], dtype=float)
-PLOTTING_STEPS_PER_SECOND: int = int(SETTINGS["plotting"]["refresh_rate"])
-    # Recommended to make it so it plots 30 step every second
-NUMBER_OF_PLOTTING_STEPS: int = int(PLOTTING_TIME * PLOTTING_STEPS_PER_SECOND)  
-    # How many plotting steps will be done in the simulation
-PLOTTING_RELATIVE_TIME_STEP: int = int(math.ceil(NUMBER_OF_TIME_STEPS / (PLOTTING_TIME * PLOTTING_STEPS_PER_SECOND))) 
-    # How much time steps get merged in a plotting step (in [ratio])
-    # This is for fluency/performance reasons, so the plotting is not too slow.
-
-DO_REPEAT_PLOTTING: bool = bool( SETTINGS["plotting"]["do_repeat"] )
-    # If True, the plotting will repeat the last frame when it ends
+# default settings must contains all the keys used in CONSTANTS with their default value, 
+  # so if some miss in the settings.yaml, the programm take the default one
+DEFAULT_SETTINGS_DICT: dict[str, Any] = {
+    "simulation": {
+        "simulation_time": 40,
+        "time_step": 0.01,
+        "max_allowed_force": np.inf,
+        "is_adaptative": True,
+        "max_velocity_diff": 100, # meassure the adapatative accuracy
+    },
+    "plotting": {
+        "plotting_time": 10,
+        "refresh_rate": 20,
+        "do_repeat": False,
+        "dot_sizes": {
+            "min": 15.0,
+            "max": 75.0,
+            "difference": 6.0,
+            "exponent_factor": 0.666
+        }
+    },
+}

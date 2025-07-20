@@ -10,7 +10,7 @@ P = ParamSpec('P')  # For type hinting *args, **kwargs
 
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from constants import MAX_FORCE_MODULE
+from settings.config_user import USER_CONFIGURATION as CONFIGURATION
 
 def stack_positions(*particles_positions: np.ndarray) -> np.ndarray:
     """Stack the positions of multiple particles into a single numpy array.
@@ -23,7 +23,7 @@ def stack_positions(*particles_positions: np.ndarray) -> np.ndarray:
     """
     return np.stack(particles_positions, axis=1)
 
-def limit_force_module(force_func: Callable[P, np.ndarray], max_force_module: float | np.ndarray = MAX_FORCE_MODULE) -> Callable[P, np.ndarray]:
+def limit_force_module(force_func: Callable[P, np.ndarray], max_force_module: float | np.ndarray = CONFIGURATION.simulation.max_velocity_diff) -> Callable[P, np.ndarray]:
     @wraps(force_func) # Copy attributes (e.g. `__doc__`) from the wrapped function (debbuging)
     def wrapper_function(*args, **kwargs):
         return_force = force_func(*args, **kwargs)

@@ -9,7 +9,7 @@ plotting:
   refresh_rate: 20
   do_repeat: off
   dot_sizes:
-    min: 15
-    max: 75
-    size_difference: 12
+    min: 15.0
+    max: 75.0
+    difference: 12.0
     exponent_factor: 0.66

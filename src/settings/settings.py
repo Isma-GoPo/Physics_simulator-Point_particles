@@ -3,6 +3,14 @@ from typing import Any
 from icecream import ic
 import numpy as np
 
+# My modules
+from .config_class import Config
+
+# relative imports
+import os, sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from constants import SETTING_FILE_PATH, DEFAULT_SETTINGS_DICT
+
 
 def merge_dicts(default: dict, overrider: dict) -> dict:
     """Merge two dictionaries, ensuring each child key is also merged. So each branch of keys is present in the return"""
@@ -22,33 +30,9 @@ def merge_dicts(default: dict, overrider: dict) -> dict:
     return return_dict
 
 def open_user_settings() -> dict[str, Any]:
-    with open(r"src\settings.yaml") as file:
+    with open(SETTING_FILE_PATH) as file:
         return yaml.safe_load(file)
 
-user_settings = open_user_settings()
+USER_SETTINGS_DICT: dict[str, Any] = open_user_settings()
 
-# default settings must contains all the keys used in CONSTANTS with their default value, 
-  # so if some miss in the settings.yaml, the programm take the default one
-default_settings = {
-    "simulation": {
-        "simulation_time": 40,
-        "time_step": 0.01,
-        "max_allowed_force": np.inf,
-        "is_adaptative": True,
-        "max_velocity_diff": 100, # meassure the adapatative accuracy
-    },
-    "plotting": {
-        "plotting_time": 10,
-        "refresh_rate": 20,
-        "do_repeat": False,
-        # max_velocity_diff:
-        "dot_sizes": {
-            "min": 15,
-            "max": 75,
-            "size_difference": 6,
-            "exponent_factor": 0.666
-        }
-    },
-}
-
-SETTINGS: dict[str, Any] = merge_dicts(default_settings, user_settings)
+DEFAULT_CONFIGURATION: Config = Config(DEFAULT_SETTINGS_DICT)
