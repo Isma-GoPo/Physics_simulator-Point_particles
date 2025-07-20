@@ -1,9 +1,9 @@
 import numpy as np
 import math
-from .config_class import Config
+from .nestedhash import NestedHash
 
 
-class ConfigPlotting(Config):
+class ConfigPlotting(NestedHash):
     def __init__(self, plotting_config: Config) -> None:
         """Init a 'ConfigSimulation' object
 
