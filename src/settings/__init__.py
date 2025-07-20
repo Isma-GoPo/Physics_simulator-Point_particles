@@ -4,7 +4,7 @@ For mannaging this settings it uses config classes
 """
 
 from . import settings, config_simulation, constants #, config_plotting
-from config_simulation import ConfigSimulation
+from .config_simulation import ConfigSimulation
 
 
 

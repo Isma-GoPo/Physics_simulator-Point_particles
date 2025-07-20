@@ -1,7 +1,6 @@
 """`particle_space` module include the `ParticleSpace` class"""
 
 import numpy as np
-from icecream import ic
 from collections.abc import Callable # Allow to use Callable (what means function) for type hints (specifying the input output of the function as argument)
 
 from .particle import Particle
@@ -75,9 +74,7 @@ class ParticleSpace(list):
     def is_being_adaptative(self, state: bool) -> None:
         state = bool(state)
         if state != self._is_being_adaptative:    # Only works if it alternate it state
-            #ic(state)
             self._is_being_adaptative = state
-            #ic(self._is_being_adaptative)
             for particle in self:
                 particle.is_being_adaptative = state
             
@@ -159,7 +156,6 @@ class ParticleSpace(list):
         self.adapatative_recursive_iteration(time_step)
         self._life_time += time_step
         self.is_being_adaptative = False
-        #ic("iteration")
 
     def iterate_time_step(self, time_step: float = 1.) -> None:
         """Advance all particles in the space for the given steps operating with the given functions.

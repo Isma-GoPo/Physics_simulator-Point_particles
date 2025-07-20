@@ -5,7 +5,7 @@ from omegaconf import OmegaConf
 import numpy as np
 
 import os, sys; sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
-from settings import merge_dicts
+from settings.settings import merge_dicts
 
 
 SETTING_FILE_PATH: str = r"src\settings.yaml"
