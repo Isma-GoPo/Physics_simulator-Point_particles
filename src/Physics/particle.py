@@ -1,6 +1,7 @@
 """`particle` module include the `Particle` class"""
 
 import numpy as np
+from icecream import ic
 
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -40,7 +41,9 @@ class Particle:
         self._last_acceleration = np.zeros(3)
         self._position_history = np.empty((0, 3), float)
         self._life_time = 0.0
+        self._is_being_adaptative: bool = False
 
+        # plotting properties
         self.plotting = plotting_dot if plotting_dot is not None else PlottingDot(weight=self.mass)
 
     # --- PROPERTIES ---
@@ -70,6 +73,33 @@ class Particle:
         """Read-only access to the position history."""
         return self._position_history.copy()
     
+    @property
+    def life_time(self) -> float:
+        """Read-only access to the life the particle have lived."""
+        return self._life_time
+    
+    @property
+    def is_being_adaptative(self) -> bool:
+        """Read the state (adapatative) of the particle.
+        
+        If the particle is being adaptative, it means that the time steps that its running are shorter than normally,
+        so it should behave in a different way:
+        - store_position_in_history only should work when it stop to be adapatative"""
+        return self._is_being_adaptative
+    
+    @is_being_adaptative.setter
+    def is_being_adaptative(self, state: bool) -> None:
+        state = bool(state)
+        if state != self._is_being_adaptative:    # Only works if it alternate it state
+            self._is_being_adaptative = state
+            
+            if state == True:
+                pass
+                # This means that some functions works different:
+                # - store_position_in_history
+            else:
+                self.store_position_in_history()
+    
     # --- METHODS ---
     
     # --- RETURNING METHODS ---
@@ -89,7 +119,7 @@ class Particle:
     def is_adaptative_ok(self, time_step: float, max_velocity_diff: float | np.floating) -> bool:
         """Return wheter the  tuple of the velocity difference arrays for each particle in the space."""
         return self.velocity_differential(time_step) < float(max_velocity_diff)
-    
+
     # --- OPERATING METHODS ---
 
     def do_translate(self, time_step: float = 1.0, forced_velocity: np.ndarray | None = None) -> None:
@@ -140,7 +170,8 @@ class Particle:
 
     def store_position_in_history(self) -> None:
         """Stores the current position in the position history."""
-        self._position_history = np.vstack((self.position_history, [self.position]))
+        if not self.is_being_adaptative:
+            self._position_history = np.vstack((self.position_history, [self.position]))
 
     def store_current_state(self) -> None:
         """Stores the current position in history and velocity and acceleration as the last ones and reset them."""

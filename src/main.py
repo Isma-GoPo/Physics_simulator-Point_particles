@@ -18,11 +18,10 @@ from space_plotting import print_animated_simulation_by_space, get_dot_size_list
 if __name__=="__main__":
     #space = utils.init_space.circular_motion_decelerating_particle()
     space = utils.init_space.solar_system()
-    space.adaptative_max_velocity_diff = 100
+    space.adaptative_max_velocity_diff = 50
     space.is_adaptative = True
 
+    ic(space.is_being_adaptative)
     space.run_simulation(NUMBER_OF_TIME_STEPS, TIME_STEP)
-
-    #ic(space.get_particle_property_array("velocity"))
     
     print_animated_simulation_by_space(space)

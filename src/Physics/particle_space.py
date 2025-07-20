@@ -26,6 +26,7 @@ class ParticleSpace(list):
         self._life_time = 0.0
         self.is_adaptative: bool = is_adaptative
         self.adaptative_max_velocity_diff: float | np.floating = adaptative_max_velocity_diff
+        self._is_being_adaptative = False
 
     # --- PROPERTIES ---
     
@@ -65,6 +66,25 @@ class ParticleSpace(list):
     def life_time(self) -> float:
         """Read-only access to the life the particle have lived."""
         return self._life_time
+    
+    @property
+    def is_being_adaptative(self) -> bool:
+        return self._is_being_adaptative
+
+    @is_being_adaptative.setter
+    def is_being_adaptative(self, state: bool) -> None:
+        state = bool(state)
+        if state != self._is_being_adaptative:    # Only works if it alternate it state
+            #ic(state)
+            self._is_being_adaptative = state
+            #ic(self._is_being_adaptative)
+            for particle in self:
+                particle.is_being_adaptative = state
+            
+            if state == True:
+                pass
+            else:
+                pass
 
     # --- METHODS ---
 
@@ -126,8 +146,8 @@ class ParticleSpace(list):
     def adapatative_recursive_iteration(self, time_step: float) -> None:
         if self.is_adaptative_ok(time_step):
             self.advance_particles_time_step(time_step)
-            self._life_time += time_step
         else:
+            self.is_being_adaptative = True
             lower_time_step = time_step/2
             
             self.adapatative_recursive_iteration(lower_time_step)
@@ -136,8 +156,10 @@ class ParticleSpace(list):
 
     def adapatative_iterate_time_step(self, time_step: float) -> None:
         self.apply_all_forces_array()
-
         self.adapatative_recursive_iteration(time_step)
+        self._life_time += time_step
+        self.is_being_adaptative = False
+        #ic("iteration")
 
     def iterate_time_step(self, time_step: float = 1.) -> None:
         """Advance all particles in the space for the given steps operating with the given functions.
@@ -146,9 +168,7 @@ class ParticleSpace(list):
         time_step: [s] the time step to advance each particle.
         """
         self.apply_all_forces_array()
-        
         self.advance_particles_time_step(time_step)
-        
         self._life_time += time_step
 
 

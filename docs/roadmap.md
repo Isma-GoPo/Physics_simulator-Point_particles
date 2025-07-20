@@ -2,10 +2,10 @@
 This is the roadmap of this repository. The features I want to be adding in a future.
 
 ## More functions and init spaces
-- Add more functions
+- [ ] Add more functions
 
 ### Live time span
-- Add to Particle its `live time span`
+- [x] Add to Particle its `live time span`
   - This allow time-depending functionsw
 
 ## Charge particle
