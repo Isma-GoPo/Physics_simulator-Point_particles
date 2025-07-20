@@ -1,19 +1,16 @@
 """This module introduces the constants for the program
 
 Constants:
-
+TIME_STEP: [s] (float) How much it "tick" advance the time in the simulation
+SIMULATION_TIME: [s] (float) How much the simulation last
+NUMBER_OF_TIME_STEPS: [int] number time steps will be done in the simulation
 """
-
-
 import numpy as np
 import math
 from icecream import ic
 
-
 # My modules
 from settings.settings import SETTINGS
-
-SETTING_FILE_PATH: str = r"src\settings.yaml"
 
 # --- SIMULATION PHYSICS CONSTANTS ---
 MAX_FORCE_MODULE: float | np.float64 = np.float64( SETTINGS["simulation"]["max_allowed_force"] )
@@ -28,13 +25,6 @@ SIMULATION_TIME: float | np.float64 = np.float64( SETTINGS["simulation"]["simula
 NUMBER_OF_TIME_STEPS: int = int(SIMULATION_TIME / TIME_STEP)  
 if NUMBER_OF_TIME_STEPS > 100_000: raise Exception("Too many time steps could crash")
     # How many time steps will be done in the simulation
-
-# --- ADPATATIVE SIMULATION ---
-IS_ADPATATIVE: bool = bool( SETTINGS["simulation"]["is_adaptative"] )
-    # If True, the simulation will be adaptative
-ADPATATIVE_MAX_VELOCITY_DIFF: float | np.float64 = np.float64( SETTINGS["simulation"]["max_velocity_diff"] )
-    # defines the the adapatative accuracy
-
 
 # --- PLOTTING CONSTANTS ---
 PLOTTING_TIME: float | np.float64 = np.float64( SETTINGS["plotting"]["plotting_time"] )
@@ -58,3 +48,4 @@ PLOTTING_RELATIVE_TIME_STEP: int = int(math.ceil(NUMBER_OF_TIME_STEPS / (PLOTTIN
 
 DO_REPEAT_PLOTTING: bool = bool( SETTINGS["plotting"]["do_repeat"] )
     # If True, the plotting will repeat the last frame when it ends
+
