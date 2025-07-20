@@ -1,5 +1,20 @@
 This is the log file. Its purpose is to have an idea of what I have done when I enter the project a long time later.
 
+## v0.5 [2025-07-20]
+###### Summary
+Upgraded the pyhisics module so now its support adaptative simulation and has life_time property. Added a solar system init space. 
+
+
+###### Adaptative simulation
+- Make a particle/space detect when the acceleration (increase in velocity for an step) is too big (defined by configuration) so it split the steps in two recursively
+  - Make every iteration check the velocity_diff and split the steps only if necessary.
+- Then merge all this steps in just one position_history (so plotting and future features are easier)
+
+###### Other changes
+- Added to Particle and ParticleSpace its `live time span`
+  - This allow time-depending functions
+- Deleted unused extra single_forces_array and couple_forces_array (not in self arrays)
+
 ## v0.4 [2025-07-16]
 Organaising repo: adding roadmap, license; deleting unused modules and __pycache__.
 Added functional setting.yalm for configuring the simulation and plotting
@@ -9,7 +24,7 @@ Added functional setting.yalm for configuring the simulation and plotting
 ###### Summary
 Better physics package with ParticleSpace class, dynamic>force functions, and quick default space initializers
 
-###### Detailed changes
+###### Detailed changes of physics package
 - Updated the Particle class
   - Include a position history and privatized certain properties.
   - updated apply_acceleration method workings for more accurate results
@@ -20,6 +35,8 @@ Better physics package with ParticleSpace class, dynamic>force functions, and qu
   - Added gravitational, viscosity force, and other cinematic forces to play with. 
   - Added limit_force decorator
   - deprecated "dynamic_operations" for just forces that get applied in ParticleSpace
+
+###### Other changes
 - Introduced an `init_particle` and `init_space` module in the utils package for creating default particles and spaces (runs quickly)
   - gravitational orbit, circular motion, free-falling particles, etc.
 
