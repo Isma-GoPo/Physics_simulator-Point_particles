@@ -1,5 +1,10 @@
 This is the log file. Its purpose is to have an idea of what I have done when I enter the project a long time later.
 
+## v0.7 
+...
+
+Made Dot to plotting class independent of the particles itselfs
+
 ## v0.6 [2025-07-22]
 ###### Summary
 Constants of the simulation or plotting are now managed by `settings` module, mainly by `Config` class and its subclasses. That inherit from a new `NestedHash` class.

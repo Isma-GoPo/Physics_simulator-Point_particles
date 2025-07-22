@@ -2,8 +2,8 @@ simulation:
   simulation_time: 3.156e+7    # in secs
   time_step: 8640
   #max_allowed_force: 10
-  is_adaptative: True
-  max_velocity_diff: 20 # meassure the adapatative accuracy
+  is_adaptative: False
+  max_velocity_diff: 0.1 # meassure the adapatative accuracy
 plotting: 
   plotting_time: 10
   refresh_rate: 20

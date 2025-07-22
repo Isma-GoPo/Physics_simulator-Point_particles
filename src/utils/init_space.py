@@ -57,6 +57,75 @@ def solar_system() -> tuple[physics.ParticleSpace, dict]:
                               single_forces_array=())
     return space, custom_settings
 
+def two_particles_from_repose(initial_position: np.ndarray | None = None) -> tuple[physics.ParticleSpace, dict]:
+    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
+    custom_settings = {
+        "simulation": {
+            "simulation_time": 96213*1.05,
+            "time_step": 10,
+            "is_adaptative": True,
+            "max_velocity_diff": 0.001
+        },
+        "plotting": {
+            "plotting_time": 3,
+            "refresh_rate": 20,
+            "do_repeat": False
+        }
+    }
+
+    initial_position = initial_position if initial_position is not None else np.array([0.0, 0.0, 0.5])
+    space = physics.ParticleSpace()
+    space.append(physics.Particle(1.0, initial_position=np.array(initial_position)))
+    space.append(physics.Particle(1.0, initial_position=np.array(-initial_position)))
+    space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.gravitational_force,))
+    return space, custom_settings
+
+def two_particles_from_repose_adaptative(initial_position: np.ndarray | None = None) -> tuple[physics.ParticleSpace, dict]:
+    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
+    custom_settings = {
+        "simulation": {
+            "simulation_time": 96213*2,
+            "time_step": 100,
+            "is_adaptative": True,
+            "max_velocity_diff": 0.00005
+        },
+        "plotting": {
+            "plotting_time": 3,
+            "refresh_rate": 20,
+            "do_repeat": False
+        }
+    }
+
+    initial_position = initial_position if initial_position is not None else np.array([0.0, 0.0, 0.5])
+    space = physics.ParticleSpace()
+    space.append(physics.Particle(1.0, initial_position=np.array(initial_position)))
+    space.append(physics.Particle(1.0, initial_position=np.array(-initial_position)))
+    space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.gravitational_force,))
+    return space, custom_settings
+
+def orbiting_decelerating_particles(initial_position: np.ndarray | None = None) -> tuple[physics.ParticleSpace, dict]:
+    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
+    custom_settings = {
+        "simulation": {
+            "simulation_time": 40,
+            "time_step": 0.01,
+        },
+        "plotting": {
+            "plotting_time": 10,
+            "refresh_rate": 20,
+            "do_repeat": False
+        }
+    }
+
+    initial_position = initial_position if initial_position is not None else np.array([0.0, 0.0, 1.])
+    initial_velocity = np.array([0.5, 0.0, 0.0])  # Perpendicular to the position vector for circular orbit
+    space = physics.ParticleSpace()
+    space.append(physics.Particle(1.0, initial_position=initial_position, initial_velocity = initial_velocity))
+    space.append(physics.Particle(1.0, initial_position=-initial_position, initial_velocity = -initial_velocity))
+    space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.cinematic_atraction_force,),
+                              single_forces_array=(partial(physics.dynamics.forces.viscosity_force,viscosity_constant=0.1),))
+    return space, custom_settings
+
 def orbiting_particles(initial_position: np.ndarray | None = None) -> physics.ParticleSpace:
     """Creates a particle space with mass=1, Vx=1 and with gravity field."""
     initial_position = initial_position if initial_position is not None else np.array([0.0, 0.0, 1.])
@@ -67,17 +136,6 @@ def orbiting_particles(initial_position: np.ndarray | None = None) -> physics.Pa
     space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.cinematic_atraction_force,))
     return space
 
-
-def orbiting_decelerating_particles(initial_position: np.ndarray | None = None) -> physics.ParticleSpace:
-    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
-    initial_position = initial_position if initial_position is not None else np.array([0.0, 0.0, 1.])
-    initial_velocity = np.array([0.5, 0.0, 0.0])  # Perpendicular to the position vector for circular orbit
-    space = physics.ParticleSpace()
-    space.append(physics.Particle(1.0, initial_position=initial_position, initial_velocity = initial_velocity))
-    space.append(physics.Particle(1.0, initial_position=-initial_position, initial_velocity = -initial_velocity))
-    space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.cinematic_atraction_force,),
-                              single_forces_array=(partial(physics.dynamics.forces.viscosity_force,viscosity_constant=0.1),))
-    return space
 
 def circular_motion_particle(initial_position: np.ndarray | None = None) -> physics.ParticleSpace:
     """Creates a particle space with mass=1, Vx=1 and with gravity field."""

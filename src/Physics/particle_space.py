@@ -90,7 +90,7 @@ class ParticleSpace(list):
 
     # --- SETTING METHODS ---
 
-    def update_from_configuration(self, configuration_copy: Config) -> None:
+    def update_simulation_properties_from_configuration(self, configuration_copy: Config) -> None:
         self.is_adaptative = configuration_copy.simulation.is_adaptative
         self.adaptative_max_velocity_diff = configuration_copy.simulation.max_velocity_diff
 
