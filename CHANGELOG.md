@@ -1,5 +1,19 @@
 This is the log file. Its purpose is to have an idea of what I have done when I enter the project a long time later.
 
+## v0.6 [2025-07-22]
+###### Summary
+Constants of the simulation or plotting are now managed by `settings` module, mainly by `Config` class and its subclasses. That inherit from a new `NestedHash` class.
+
+###### NestedHash
+- It is a class which allow managing nested dicts with several properties that make it usefull for using it as config objects.
+  - Allow updating all its values with a dict, forcing the type of the old value and checking for not deleting nested structures
+
+###### Config
+- Itoduced a general `Config` class in `settings` that acts as a constant for the default simulation and plotting configuration. 
+  - For it, the module initialize `CONFIGURATION = Config()` constant
+  - Is intented to be used as a unique instance in the program.
+- It is set up from `ConfigSimulation`, `ConfigPlotting`, `ConfigSizes` classes (also inherit from `NestedHash`)
+
 ## v0.5 [2025-07-20]
 ###### Summary
 Upgraded the pyhisics module so now its support adaptative simulation and has life_time property. Added a solar system init space. 
