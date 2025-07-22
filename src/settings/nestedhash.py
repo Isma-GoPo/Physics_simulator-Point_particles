@@ -1,6 +1,7 @@
 """`nestedhash` module include the `NestedHash` class"""
 
 from typing import Any
+from copy import deepcopy
 
 class NestedHash():
     """
@@ -40,6 +41,11 @@ class NestedHash():
             if isinstance(value, NestedHash): # Also True if it is a subclass
                 dict[key] = value.as_dictionary
         return dict
+    
+    @property
+    def copy(self) -> Any:
+        """Return a copy of the object"""
+        return deepcopy(self)
     
     # --- Dunder methods ---
 
@@ -87,10 +93,6 @@ class NestedHash():
         except:
             return None
     
-    def copy(self):
-        cls = self.__class__
-        return cls(self.as_dictionary)
-    
     def update(self, new_dictionary: dict[str, Any]) -> None:
         """Update the object with a new dictionary, forcing the new type to be the old one. 
         If the value to overweite is a NestedHash, it recursevely update it.
@@ -122,7 +124,14 @@ if __name__ == "__main__":
 
     import numpy as np
     obj = NestedHash({"simulation_time": 40, "time": {"life": {"first": 3.2, "second": 2}, "death": 28}})
-    print(repr(obj))
+    #print(repr(obj))
     obj.update({"time": {"life": {"first": 1}}})
-    print(obj.a) # type: ignore
-    print(obj["timelife.second"])
+    #print(obj.a) # type: ignore
+    #print(obj["timelife.second"])
+
+    obj2 = obj.copy
+    obj2.update({"time": {"life": {"first": 5}}})
+    print(obj)
+    print(obj2)
+
+
