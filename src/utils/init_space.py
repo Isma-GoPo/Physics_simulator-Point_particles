@@ -13,8 +13,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import physics
 
 
-def solar_system() -> physics.ParticleSpace:
-    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
+def solar_system() -> tuple[physics.ParticleSpace, dict]:
+    """Creates a particle space with mass=1, Vx=1 and with gravity field.
+    
+    Return:
+    - Space particle
+    - Custom settings dictionary for updating the programm configuration
+    """
     solar_system_data=[[1.989e30, 0.0, 0.0], #sun
                        [3.285e23, 47e9, 58.97e3], #mercury
                        [4.87e24, 107.48e9, 36.259e3], #venus
@@ -22,6 +27,25 @@ def solar_system() -> physics.ParticleSpace:
                        [6.4169e23, 206.62e9, 26.50e3], #mars
                        [7.342e22, 147.098e9+363e6, 30.29e3+1.082e3], #moon
                       ]
+    
+    custom_settings = {
+        "simulation": {
+            "simulation_time": 3.156e+7,
+            "time_step": 86400,
+            "is_adaptative": False,
+            "max_velocity_diff": 60
+        },
+        "plotting": {
+            "plotting_time": 10,
+            "refresh_rate": 20,
+            "dot_sizes": {
+                "min": 15.0,
+                "max": 75.0,
+                "difference": 12.0,
+                "exponent_factor": 0.66
+            }
+        }
+    }
 
     space = physics.ParticleSpace()
     for mass, x, v in solar_system_data:
@@ -31,7 +55,7 @@ def solar_system() -> physics.ParticleSpace:
 
     space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.gravitational_force,),
                               single_forces_array=())
-    return space
+    return space, custom_settings
 
 def orbiting_particles(initial_position: np.ndarray | None = None) -> physics.ParticleSpace:
     """Creates a particle space with mass=1, Vx=1 and with gravity field."""

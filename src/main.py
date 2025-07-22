@@ -21,7 +21,9 @@ CONFIGURATION.update(USER_SETTING_DICT)
 # Running the file
 if __name__=="__main__":
     #space = utils.init_space.circular_motion_decelerating_particle()
-    space = utils.init_space.solar_system()
+    space, custom_settings = utils.init_space.solar_system()
+    CONFIGURATION.update(custom_settings)
+
     space.adaptative_max_velocity_diff = CONFIGURATION.simulation.max_velocity_diff   
     space.is_adaptative = CONFIGURATION.simulation.is_adaptative   
 
@@ -30,4 +32,5 @@ if __name__=="__main__":
     
     space.run_simulation(CONFIGURATION.simulation.number_of_time_steps, CONFIGURATION.simulation.time_step)  
     
+    print(CONFIGURATION)
     print_animated_simulation_by_space(space) 
