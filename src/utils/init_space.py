@@ -31,9 +31,9 @@ def solar_system() -> tuple[physics.ParticleSpace, dict]:
     custom_settings = {
         "simulation": {
             "simulation_time": 3.156e+7,
-            "time_step": 86400,
-            "is_adaptative": False,
-            "max_velocity_diff": 60
+            "time_step": 8640,
+            "is_adaptative": True,
+            "max_velocity_diff": 200
         },
         "plotting": {
             "plotting_time": 10,

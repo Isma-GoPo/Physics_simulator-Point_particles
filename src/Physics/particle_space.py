@@ -5,10 +5,10 @@ from collections.abc import Callable # Allow to use Callable (what means functio
 
 from .particle import Particle
 
-import sys
-import os
-#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-#from plotting import print_simulation_animated
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from settings import Config
+
 
 class ParticleSpace(list):
     """A class for managing a space containing multiple particles. Inherits from list."""
@@ -23,6 +23,7 @@ class ParticleSpace(list):
         self._single_forces_array = single_forces_array if single_forces_array is not None else ()
         self._couple_forces_array = couple_forces_array if couple_forces_array is not None else ()
         self._life_time = 0.0
+        
         self.is_adaptative: bool = is_adaptative
         self.adaptative_max_velocity_diff: float | np.floating = adaptative_max_velocity_diff
         self._is_being_adaptative = False
@@ -84,6 +85,13 @@ class ParticleSpace(list):
                 pass
 
     # --- METHODS ---
+
+    # --- SETTING METHODS ---
+
+    def update_from_configuration(self, configuration_copy: Config) -> None:
+        self.is_adaptative = configuration_copy.simulation.is_adaptative
+        self.adaptative_max_velocity_diff = configuration_copy.simulation.max_velocity_diff
+
 
     # --- RETURNING METHODS ---
 

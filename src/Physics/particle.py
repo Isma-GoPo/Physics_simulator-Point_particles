@@ -100,7 +100,7 @@ class Particle:
             else:
                 self.store_position_in_history()
     
-    # --- METHODS ---
+    # --- METHODS ---        
     
     # --- RETURNING METHODS ---
     def __str__(self) -> str:

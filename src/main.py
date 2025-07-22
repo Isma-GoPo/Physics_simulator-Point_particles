@@ -24,8 +24,7 @@ if __name__=="__main__":
     space, custom_settings = utils.init_space.solar_system()
     CONFIGURATION.update(custom_settings)
 
-    space.adaptative_max_velocity_diff = CONFIGURATION.simulation.max_velocity_diff   
-    space.is_adaptative = CONFIGURATION.simulation.is_adaptative   
+    space.update_from_configuration(CONFIGURATION.copy)
 
     if CONFIGURATION.simulation.could_crass:    
         raise Exception("Too many time steps could crash")

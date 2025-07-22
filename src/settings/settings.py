@@ -48,10 +48,5 @@ class Config(NestedHash):
         self.plotting.dot_sizes.difference = 6.0            # type: ignore
         self.plotting.dot_sizes.exponent_factor = 0.666     # type: ignore
 
-    @property
-    def copy(self) -> Any:
-        """Do not use. Config instance isn't intended for being copied. Use the same instance in all the program so all the functions work properly"""
-        raise NotImplementedError("Config instance isn't intended for being copied")
-
 CONFIGURATION = Config() # Just one istance of the object shared in all modules
 CONFIGURATION.update(USER_SETTING_DICT)

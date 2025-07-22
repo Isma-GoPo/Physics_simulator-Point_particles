@@ -3,7 +3,7 @@
 For mannaging this settings it uses config classes
 """
 
-from .settings import CONFIGURATION
+from .settings import CONFIGURATION, Config
 
 
 
