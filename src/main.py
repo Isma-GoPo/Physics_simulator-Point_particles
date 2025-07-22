@@ -12,21 +12,22 @@ from time import perf_counter
 import physics
 #from plotting import print_animated_poistion_by_array, print_animated_simulation_by_space
 from space_plotting import print_animated_simulation_by_space, get_dot_size_list
-from settings.config_user import USER_CONFIGURATION as CONFIGURATION
+from settings import CONFIGURATION
+from constants import USER_SETTING_DICT
 
-
+CONFIGURATION.update(USER_SETTING_DICT)
 
 
 # Running the file
 if __name__=="__main__":
     #space = utils.init_space.circular_motion_decelerating_particle()
     space = utils.init_space.solar_system()
-    space.adaptative_max_velocity_diff = CONFIGURATION.simulation.max_velocity_diff
-    space.is_adaptative = CONFIGURATION.simulation.is_adaptative
+    space.adaptative_max_velocity_diff = CONFIGURATION.simulation.max_velocity_diff   
+    space.is_adaptative = CONFIGURATION.simulation.is_adaptative   
 
-    if CONFIGURATION.simulation.could_crass():
+    if CONFIGURATION.simulation.could_crass:    
         raise Exception("Too many time steps could crash")
     
-    space.run_simulation(CONFIGURATION.simulation.number_of_time_steps, CONFIGURATION.simulation.time_step)
+    space.run_simulation(CONFIGURATION.simulation.number_of_time_steps, CONFIGURATION.simulation.time_step)  
     
-    print_animated_simulation_by_space(space)
+    print_animated_simulation_by_space(space) 

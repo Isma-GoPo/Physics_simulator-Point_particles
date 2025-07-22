@@ -8,12 +8,16 @@ from . import config_subclasses as configs
 from .nestedhash import NestedHash
 
 # relative imports
-#import os, sys
-#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import os, sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from constants import USER_SETTING_DICT
 
 
 # --- Default values ---
 class Config(NestedHash):
+    """
+    Group all the constants/settings/config for the simulation and plotting that could be changed by a user or a init_space function
+    Inherit from NestedHash"""
     def __init__(self) -> None:
         cls = self.__class__
         
@@ -27,7 +31,7 @@ class Config(NestedHash):
             # Maximum force module (norm) that can be applied to a particle (in [N]) `np.inf` means no limit
         self.simulation.is_adaptative = True
             # If True, the simulation will be adaptative
-        self.simulation.max_velocity_diff = 100.0 
+        self.simulation.max_velocity_diff = 100.
             # defines the the adapatative accuracy
 
         self.plotting = configs.ConfigPlotting()
@@ -44,3 +48,5 @@ class Config(NestedHash):
         self.plotting.dot_sizes.difference = 6.0            # type: ignore
         self.plotting.dot_sizes.exponent_factor = 0.666     # type: ignore
 
+CONFIGURATION = Config() # Just one istance of the object shared in all modules
+CONFIGURATION.update(USER_SETTING_DICT)

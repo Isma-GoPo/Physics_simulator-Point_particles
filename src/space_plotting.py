@@ -11,6 +11,7 @@ from icecream import ic
 import constants
 import utils
 from physics import ParticleSpace
+from settings import CONFIGURATION
 # ---
 
 #t = np.linspace(0, SIMULATION_TIME, NUMBER_OF_TIME_STEPS)
@@ -22,12 +23,12 @@ def get_colours_list(len: int) -> list[str]:
 
 def get_dot_size_list(particle_space) -> list[float]:
     sizes = np.array([particle.plotting.size for particle in particle_space])
-    exp = constants.PLOTTING_SIZE_EXPONENT_FACTOR
-    geometric_size = relativise_size(sizes)**exp * constants.PLOTTING_SIZE_DIFFERENCE**(1-exp) # Make something similar to the geometric mean (because area != proprotional mass)
-    return list(geometric_size*constants.PLOTTING_SIZE_PER_DIFFERENCE+constants.PLOTTING_SIZE_MIN)
+    exp = CONFIGURATION.plotting.dot_sizes.exponent_factor #type: ignore
+    geometric_size = relativise_size(sizes)**exp * CONFIGURATION.plotting.dot_sizes.difference**(1-exp) #type: ignore # Make something similar to the geometric mean (because area != proprotional mass)
+    return list(geometric_size* CONFIGURATION.plotting.dot_sizes.size_per_difference + CONFIGURATION.plotting.dot_sizes.min) #type: ignore
 
 def relativise_size(sizes: np.ndarray) -> np.ndarray:
-    default_difference = constants.PLOTTING_SIZE_DIFFERENCE
+    default_difference = CONFIGURATION.plotting.dot_sizes.difference #type: ignore #constants.PLOTTING_SIZE_DIFFERENCE
     max = np.max(sizes)
     min = np.min(sizes)
     difference = max - min
@@ -44,7 +45,7 @@ def print_animated_simulation_by_space(particle_space: ParticleSpace) -> None:
     Arguments:
     particle_space: [ParticleSpace] space that contains the simulated particles
     """
-    position_history_array = particle_space.reduced_position_history_array(constants.PLOTTING_RELATIVE_TIME_STEP)
+    position_history_array = particle_space.reduced_position_history_array(CONFIGURATION.plotting.plotting_relative_time_step(CONFIGURATION.simulation.number_of_time_steps))  # constants.PLOTTING_RELATIVE_TIME_STEP
     stacked_position_history_array = utils.arrays_utils.stack_positions(*position_history_array)
 
     x = stacked_position_history_array[:,:,0]
@@ -74,8 +75,8 @@ def print_animated_simulation_by_space(particle_space: ParticleSpace) -> None:
     animation = FuncAnimation(fig=plt.gcf(), 
                               func=update_plot_data, 
                               frames = number_of_frames, 
-                              repeat=constants.DO_REPEAT_PLOTTING,
-                              interval=1/constants.PLOTTING_STEPS_PER_SECOND*1000,
+                              repeat=CONFIGURATION.plotting.do_repeat, #type: ignore #constants.DO_REPEAT_PLOTTING,
+                              interval=1/CONFIGURATION.plotting.refresh_rate*1000, #type: ignore  #constants.PLOTTING_STEPS_PER_SECOND*1000,
                               blit=True
                               )
 
