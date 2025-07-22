@@ -11,7 +11,7 @@ import utils
 from time import perf_counter
 import physics
 #from plotting import print_animated_poistion_by_array, print_animated_simulation_by_space
-from space_plotting import print_animated_simulation_by_space, get_dot_size_list
+from space_plotting import print_animated_simulation_by_space
 from settings import CONFIGURATION
 from constants import USER_SETTING_DICT
 

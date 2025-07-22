@@ -14,7 +14,6 @@ class Particle:
                  initial_acceleration: np.ndarray | None = None,
                  *,
                  acceleration_field: np.ndarray | None = None,
-                 plotting_dot: PlottingDot | None = None,
                  ) -> None:
         """Init a 'Particle' object
 
@@ -42,9 +41,6 @@ class Particle:
         self._position_history = np.empty((0, 3), float)
         self._life_time = 0.0
         self._is_being_adaptative: bool = False
-
-        # plotting properties
-        self.plotting = plotting_dot if plotting_dot is not None else PlottingDot(weight=self.mass)
 
     # --- PROPERTIES ---
 

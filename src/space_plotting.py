@@ -12,31 +12,9 @@ import constants
 import utils
 from physics import ParticleSpace
 from settings import CONFIGURATION
+from plotting.dot import PlottingDot
+
 # ---
-
-#t = np.linspace(0, SIMULATION_TIME, NUMBER_OF_TIME_STEPS)
-
-def get_colours_list(len: int) -> list[str]:
-    colours = mcolors.TABLEAU_COLORS
-    colours_list = list(itertools.islice(itertools.cycle(colours), len))
-    return colours_list
-
-def get_dot_size_list(particle_space) -> list[float]:
-    sizes = np.array([particle.plotting.size for particle in particle_space])
-    exp = CONFIGURATION.plotting.dot_sizes.exponent_factor #type: ignore
-    geometric_size = relativise_size(sizes)**exp * CONFIGURATION.plotting.dot_sizes.difference**(1-exp) #type: ignore # Make something similar to the geometric mean (because area != proprotional mass)
-    return list(geometric_size* CONFIGURATION.plotting.dot_sizes.size_per_difference + CONFIGURATION.plotting.dot_sizes.min) #type: ignore
-
-def relativise_size(sizes: np.ndarray) -> np.ndarray:
-    default_difference = CONFIGURATION.plotting.dot_sizes.difference #type: ignore #constants.PLOTTING_SIZE_DIFFERENCE
-    max = np.max(sizes)
-    min = np.min(sizes)
-    difference = max - min
-    if difference <= default_difference:
-        return sizes-min
-    else:
-        relative = lambda size: (size-min)*default_difference/difference
-        return np.vectorize(relative)(sizes)  # like map()
 
 
 def print_animated_simulation_by_space(particle_space: ParticleSpace) -> None:
@@ -57,8 +35,8 @@ def print_animated_simulation_by_space(particle_space: ParticleSpace) -> None:
     axis.set_xlim(np.min(x), np.max(x))
     axis.set_ylim(np.min(y), np.max(y))
 
-    colours_list = get_colours_list(number_of_particles)
-    size_list = get_dot_size_list(particle_space)
+    colours_list = PlottingDot.get_colours_list(number_of_particles)
+    size_list = PlottingDot.get_plotting_size_list_from_masses(particle_space.get_particle_property_list("mass"))
 
 
     # Initialize the scatter plot. Using scatter is better for individual point properties.
@@ -81,3 +59,40 @@ def print_animated_simulation_by_space(particle_space: ParticleSpace) -> None:
                               )
 
     plt.show()
+
+
+
+# --- deprecated functions ---
+# def print_animated_poistion_by_array(stacked_particle_positions_array: np.ndarray) -> None:
+#     """Open a window to show the simulation animation of multiple particles.
+#     
+#     Arguments:
+#     *particle_positions: [m] numpy array of shape n×m×3 being n: number of time steps; m: number of particles; and 3: x, y, z coordinates.
+#     """
+#     x = stacked_particle_positions_array[:,:,0]
+#     y = stacked_particle_positions_array[:,:,2]
+#     number_of_frames = stacked_particle_positions_array.shape[0]
+#
+#     fig, axis = plt.subplots()
+#     axis.set_xlim(np.min(x), np.max(x))
+#     axis.set_ylim(np.min(y), np.max(y))
+#
+#     # erase the axis limit
+#     #axis.set_xlim(-1, 1)
+#     #axis.set_ylim(-1, 1)
+#
+#     # Initialize the line as empty so the display is empty at the start
+#     line, = axis.plot([], [], "o") # "o" for points ("-" for lines)
+#
+#     def update_plot_data(frame: int) -> tuple[Line2D]:
+#         line.set_data(x[frame], y[frame])
+#         return (line,)
+#
+#     animation = FuncAnimation(fig=plt.gcf(), 
+#                               func=update_plot_data, 
+#                               frames = number_of_frames, 
+#                               repeat=DO_REPEAT_PLOTTING,
+#                               interval=1/PLOTTING_STEPS_PER_SECOND*1000
+#                               )
+#
+#     plt.show()

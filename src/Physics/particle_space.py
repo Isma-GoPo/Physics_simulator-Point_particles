@@ -2,9 +2,11 @@
 
 import numpy as np
 from collections.abc import Callable # Allow to use Callable (what means function) for type hints (specifying the input output of the function as argument)
+from typing import Any
 
+# My modules
 from .particle import Particle
-
+# Relative imports
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from settings import Config
@@ -113,12 +115,18 @@ class ParticleSpace(list):
         """Return a tuple of arrays for the given property of each particle in the space."""
         return tuple(getattr(particle, property_name) for particle in self)
 
+    def get_particle_property_list(self, property_name: str) -> list[Any]:
+        """Return a list of arrays for the given property of each particle in the space."""
+        return [getattr(particle, property_name) for particle in self]
+
     def reduced_position_history_array(self, steps_relation: int = 1) -> tuple[np.ndarray, ...]:
         return tuple(particle.position_history[::steps_relation] for particle in self)
     
     def is_adaptative_ok(self, time_step: float) -> bool:
         """Return wheter the  tuple of the velocity difference arrays for each particle in the space."""
         return all((particle.is_adaptative_ok(time_step, self.adaptative_max_velocity_diff) for particle in self))
+
+    # --- INITIALASING METHODS ---
 
     # --- OPERATING METHODS ---
 
