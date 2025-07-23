@@ -93,8 +93,8 @@ class ParticleSpace(list):
     # --- SETTING METHODS ---
 
     def update_simulation_properties_from_configuration(self, configuration_copy: Config) -> None:
-        self.is_adaptative = configuration_copy.simulation.is_adaptative
-        self.adaptative_max_velocity_diff = configuration_copy.simulation.max_velocity_diff
+        self.is_adaptative = configuration_copy.simulation.adaptability.is_adaptative
+        self.adaptative_max_velocity_diff = configuration_copy.simulation.adaptability.max_velocity_diff
 
 
     # --- RETURNING METHODS ---
@@ -140,6 +140,7 @@ class ParticleSpace(list):
         Returns:
         True if the step size is okay, False if it should be shorter
         """
+        ic(adapatative_conditionals)
         return all((particle.check_adaptative_ok(time_step, **adapatative_conditionals) for particle in self))
 
     # --- INITIALASING METHODS ---

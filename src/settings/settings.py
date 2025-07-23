@@ -29,9 +29,13 @@ class Config(NestedHash):
             # 0.001 slow but really accurate
         self.simulation.max_allowed_force = np.inf
             # Maximum force module (norm) that can be applied to a particle (in [N]) `np.inf` means no limit
-        self.simulation.is_adaptative = True
+
+        self.simulation.adaptability = configs.ConfigAdapt()
+        self.simulation.adaptability.is_adaptative = True
             # If True, the simulation will be adaptative
-        self.simulation.max_velocity_diff = 100.
+        self.simulation.adaptability.max_adaptative_percentile = 1.
+        self.simulation.adaptability.max_adaptative_deviation = 0.
+        self.simulation.adaptability.max_velocity_diff = 100.
             # defines the the adapatative accuracy
 
         self.plotting = configs.ConfigPlotting()
@@ -43,10 +47,10 @@ class Config(NestedHash):
             # If True, the plotting will repeat the last frame when it ends
 
         self.plotting.dot_sizes = configs.ConfigSizes()
-        self.plotting.dot_sizes.min = 15.0                  # type: ignore
-        self.plotting.dot_sizes.max = 75.0                  # type: ignore
-        self.plotting.dot_sizes.difference = 6.0            # type: ignore
-        self.plotting.dot_sizes.exponent_factor = 0.666     # type: ignore
+        self.plotting.dot_sizes.min = 15.0               
+        self.plotting.dot_sizes.max = 75.0                  
+        self.plotting.dot_sizes.difference = 6.0           
+        self.plotting.dot_sizes.exponent_factor = 0.666     
 
 CONFIGURATION = Config() # Just one istance of the object shared in all modules
 CONFIGURATION.update(USER_SETTING_DICT)

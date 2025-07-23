@@ -10,13 +10,20 @@ from .nestedhash import NestedHash
 # --- Partial Config classes: for properties and methods ---
 
 # May be should be dataclass
+
+class ConfigAdapt(NestedHash):
+    def __init__(self) -> None:
+        self.is_adaptative = bool()
+        self.max_adaptative_percentile = float()
+        self.max_adaptative_deviation = float()
+        self.max_velocity_diff = float()
+
 class ConfigSimulation(NestedHash):
     def __init__(self) -> None:
         self.simulation_time = float()
         self.time_step = float()
         self.max_allowed_force = float()
-        self.is_adaptative = bool()
-        self.max_velocity_diff = float()
+        self.adapt = ConfigAdapt()
     
     @property
     def number_of_time_steps(self) -> int:
@@ -34,6 +41,7 @@ class ConfigPlotting(NestedHash):
         self.plotting_time = float()
         self.refresh_rate = int()
         self.do_repeat = bool()
+        self.dot_sizes = ConfigSizes()
     
     @property
     def number_of_plotting_steps(self) -> int:
