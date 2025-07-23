@@ -3,6 +3,8 @@
 import numpy as np
 from collections.abc import Callable # Allow to use Callable (what means function) for type hints (specifying the input output of the function as argument)
 from typing import Any
+from icecream import ic
+
 
 # My modules
 from .particle import Particle
@@ -122,9 +124,23 @@ class ParticleSpace(list):
     def reduced_position_history_array(self, steps_relation: int = 1) -> tuple[np.ndarray, ...]:
         return tuple(particle.position_history[::steps_relation] for particle in self)
     
-    def is_adaptative_ok(self, time_step: float) -> bool:
-        """Return wheter the  tuple of the velocity difference arrays for each particle in the space."""
-        return all((particle.is_adaptative_ok(time_step, self.adaptative_max_velocity_diff) for particle in self))
+    def check_adaptative_ok(self, time_step: float, 
+                            **adapatative_conditionals,
+                          ) -> bool:
+        """Return wheter the  tuple of the velocity difference arrays for each particle in the space.
+        
+        Arguments:
+        time_step: [s] the time step (to advance each particle) that will be checked
+
+        Keywords arguments:
+        max_velocity_diff: the max velocity different that will be allowed to occur in a time step (default None -> it isn't checked)
+        adaptative_percentile: the percentile in the velocity_diff_history that will be detected as non-ok if adaptative_deviation is high enough (default None -> it isn't checked)
+        adaptative_deviation: the standard deviation in the velocity_diff against velocity_diff_history that will be detected as non-ok if adaptative_percentile is high enough
+
+        Returns:
+        True if the step size is okay, False if it should be shorter
+        """
+        return all((particle.check_adaptative_ok(time_step, **adapatative_conditionals) for particle in self))
 
     # --- INITIALASING METHODS ---
 
@@ -157,7 +173,7 @@ class ParticleSpace(list):
         self.apply_couple_forces_array()
 
     def adapatative_recursive_iteration(self, time_step: float) -> None:
-        if self.is_adaptative_ok(time_step):
+        if self.check_adaptative_ok(time_step, max_velocity_diff = self.adaptative_max_velocity_diff):
             self.advance_particles_time_step(time_step)
         else:
             self.is_being_adaptative = True

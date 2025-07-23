@@ -10,13 +10,18 @@ from settings import CONFIGURATION
 
 
 
-colours = list(mcolors.TABLEAU_COLORS)
-colour_switcher: int = 0
-color_gen = itertools.cycle(colours)
+def test(*, a = None, b = None, c = None):
+    if a:
+        print("a passed")
+    if b:
+        print("b passed")
+    if c:
+        print("c passed")
 
-print(next(color_gen))
-print(next(color_gen))
-a = lambda: next(color_gen)
-print(a())
-print(a())
-print(a())
+test(b=3, c=4)
+
+array = np.array([0,1,2,3,5,6,7,8,9,10,10])
+value = np.quantile(array, 0.9, method='higher')
+print(value)    
+
+print(type(None)())

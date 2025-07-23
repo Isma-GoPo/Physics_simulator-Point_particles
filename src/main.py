@@ -22,10 +22,11 @@ CONFIGURATION.update(USER_SETTING_DICT)
 if __name__=="__main__":
     #space = utils.init_space.circular_motion_decelerating_particle()
     #space, custom_settings  = utils.init_space.orbiting_decelerating_particles()
-    space, custom_settings  = utils.init_space.two_particles_from_repose_adaptative()
+    space, custom_settings  = utils.init_space.two_particles_from_repose()
     CONFIGURATION.update(custom_settings)
-
+    
     space.update_simulation_properties_from_configuration(CONFIGURATION.copy)
+
 
     if CONFIGURATION.simulation.could_crass:    
         raise Exception("Too many time steps could crash")

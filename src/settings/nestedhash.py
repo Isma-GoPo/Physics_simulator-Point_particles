@@ -3,6 +3,9 @@
 from typing import Any
 from copy import deepcopy
 
+from icecream import ic
+
+
 class NestedHash():
     """
     A class to transform a dictionary (including nested dictionaries) into an object where keys are accessible as attributes
@@ -114,8 +117,11 @@ class NestedHash():
                     else:
                         continue
                 else:
-                    typename = type(old_value)
-                    setattr(self, key, typename(new_value))
+                    if old_value is None:
+                        setattr(self, key, new_value)
+                    else:
+                        typeclass = type(old_value)
+                        setattr(self, key, typeclass(new_value))
     
     
 

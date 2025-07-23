@@ -39,6 +39,7 @@ class Particle:
         self._last_velocity = np.zeros(3)
         self._last_acceleration = np.zeros(3)
         self._position_history = np.empty((0, 3), float)
+        self._velocity_diff_history = np.empty((0), float) # For adaptative
         self._life_time = 0.0
         self._is_being_adaptative: bool = False
 
@@ -109,12 +110,61 @@ class Particle:
         attributes = ', '.join(f"{key} = {repr(value)}" for key, value in self.__dict__.items())
         return f"{class_name}({attributes})"
     
+    # --- ADAPTATIVE METHODS ---
+    
     def velocity_differential(self, time_step: float = 1.0) -> float:
         return float( np.linalg.norm(self.acceleration_to_apply) * time_step )
     
-    def is_adaptative_ok(self, time_step: float, max_velocity_diff: float | np.floating) -> bool:
-        """Return wheter the  tuple of the velocity difference arrays for each particle in the space."""
+    def _check_adpatative_by_velocity_diff(self, time_step: float, max_velocity_diff: float = np.inf) -> bool:
         return self.velocity_differential(time_step) < float(max_velocity_diff)
+    
+    def _check_adpatative_by_percentile(self, time_step: float, adaptative_percentile: float = 1.0):
+        value = np.quantile(self._velocity_diff_history, adaptative_percentile, method='higher')
+        return self.velocity_differential(time_step) < float(value)
+
+    def _check_adpatative_by_deviation(self, time_step: float, adaptative_deviation: float = 0.0):
+        value = np.mean(self._velocity_diff_history) + adaptative_deviation * np.std(self._velocity_diff_history)
+        return self.velocity_differential(time_step) < float(value)
+
+
+    def check_adaptative_ok(self, time_step: float, 
+                         max_velocity_diff: float | None = None,
+                         adaptative_percentile: float | None = None,
+                         adaptative_deviation: float | None = None,
+                          ) -> bool:
+        """Return wheter the  tuple of the velocity difference arrays for each particle in the space.
+        
+        Arguments:
+        time_step: [s] the time step (to advance each particle) that will be checked
+
+        Keywords arguments:
+        max_velocity_diff: the max velocity different that will be allowed to occur in a time step (default None -> it isn't checked)
+        adaptative_percentile: the percentile in the velocity_diff_history that will be detected as non-ok if adaptative_deviation is high enough (default None -> it isn't checked)
+        adaptative_deviation: the standard deviation in the velocity_diff against velocity_diff_history that will be detected as non-ok if adaptative_percentile is high enough
+
+        Returns:
+        True if the step size is okay, False if it should be shorter
+        """
+        
+        # Ordered by computational cost
+
+        if max_velocity_diff is not None:
+            ok_velocity_diff = self._check_adpatative_by_velocity_diff(time_step, max_velocity_diff)
+            if not ok_velocity_diff:
+                return False
+        
+        if adaptative_percentile is not None and len(self._velocity_diff_history) >= 10: # Because percentile of less doesn't make sense
+            ok_adaptative_percentile = self._check_adpatative_by_percentile(time_step, adaptative_percentile)
+            if not ok_adaptative_percentile:
+                return False
+            
+        if adaptative_deviation is not None and len(self._velocity_diff_history) >= 2: # Because deviation of less doesn't make sense
+            ok_adaptative_deviation = self._check_adpatative_by_deviation(time_step, adaptative_deviation)
+            if not ok_adaptative_deviation:
+                return False
+        
+        return True
+
 
     # --- OPERATING METHODS ---
 
