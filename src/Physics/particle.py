@@ -155,12 +155,12 @@ class Particle:
                 return False
         
         if adaptability_config.max_velocity_diff is not None and len(self._velocity_diff_history) >= 10: # Because percentile of less doesn't make sense
-            ok_adaptative_percentile = self._check_adpatative_by_percentile(time_step, adaptability_config.max_adaptative_percentile)
+            ok_adaptative_percentile = self._check_adpatative_by_percentile(time_step, adaptability_config.max_percentile)
             if not ok_adaptative_percentile:
                 return False
             
         if adaptability_config.max_velocity_diff is not None and len(self._velocity_diff_history) >= 2: # Because deviation of less doesn't make sense
-            ok_adaptative_deviation = self._check_adpatative_by_deviation(time_step, adaptability_config.max_adaptative_deviation)
+            ok_adaptative_deviation = self._check_adpatative_by_deviation(time_step, adaptability_config.max_deviation)
             if not ok_adaptative_deviation:
                 return False
         

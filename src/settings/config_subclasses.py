@@ -14,16 +14,21 @@ from .nestedhash import NestedHash
 class ConfigAdapt(NestedHash):
     def __init__(self) -> None:
         self.is_adaptative = bool()
-        self.max_adaptative_percentile = float()
-        self.max_adaptative_deviation = float()
+        self.max_percentile = float()
+        self.max_deviation = float()
         self.max_velocity_diff = float()
+
+    @property
+    def max_absolute_value(self) -> float:
+        return self.max_velocity_diff #should generally have this name, but because it is for velocity, it is more clear as it
+
 
 class ConfigSimulation(NestedHash):
     def __init__(self) -> None:
         self.simulation_time = float()
         self.time_step = float()
         self.max_allowed_force = float()
-        self.adapt = ConfigAdapt()
+        self.adaptability = ConfigAdapt()
     
     @property
     def number_of_time_steps(self) -> int:

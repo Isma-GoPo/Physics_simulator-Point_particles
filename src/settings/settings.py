@@ -33,8 +33,8 @@ class Config(NestedHash):
         self.simulation.adaptability = configs.ConfigAdapt()
         self.simulation.adaptability.is_adaptative = True
             # If True, the simulation will be adaptative
-        self.simulation.adaptability.max_adaptative_percentile = 1.
-        self.simulation.adaptability.max_adaptative_deviation = 0.
+        self.simulation.adaptability.max_percentile = 1.
+        self.simulation.adaptability.max_deviation = 0.
         self.simulation.adaptability.max_velocity_diff = 100.
             # defines the the adapatative accuracy
 
