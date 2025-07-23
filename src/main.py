@@ -25,9 +25,9 @@ if __name__=="__main__":
     space, custom_settings  = utils.init_space.two_particles_from_repose()
     CONFIGURATION.update(custom_settings)
     
-    space.update_simulation_properties_from_configuration(CONFIGURATION.copy)
+    space.config = CONFIGURATION.simulation
 
-
+    ic(CONFIGURATION)
     if CONFIGURATION.simulation.could_crass:    
         raise Exception("Too many time steps could crash")
     

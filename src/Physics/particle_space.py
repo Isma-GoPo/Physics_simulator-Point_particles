@@ -11,7 +11,9 @@ from .particle import Particle
 # Relative imports
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from settings import Config
+from settings.config_subclasses import ConfigSimulation 
+from settings.settings import Config
+
 
 
 class ParticleSpace(list):
@@ -19,17 +21,15 @@ class ParticleSpace(list):
     def __init__(self, 
                  *particles: tuple[Particle], 
                  single_forces_array: tuple[Callable[[Particle], np.ndarray], ...] | None = None,
+                 simulation_config: ConfigSimulation = Config().simulation,
                  couple_forces_array: tuple[Callable[[Particle, Particle], np.ndarray], ...] | None = None,
-                 is_adaptative: bool = False,
-                 adaptative_max_velocity_diff: float | np.floating = np.inf,
                  ) -> None:
         super().__init__(particles)
         self._single_forces_array = single_forces_array if single_forces_array is not None else ()
         self._couple_forces_array = couple_forces_array if couple_forces_array is not None else ()
+        self.config = simulation_config
         self._life_time = 0.0
         
-        self.is_adaptative: bool = is_adaptative
-        self.adaptative_max_velocity_diff: float | np.floating = adaptative_max_velocity_diff
         self._is_being_adaptative = False
 
     # --- PROPERTIES ---
@@ -88,13 +88,18 @@ class ParticleSpace(list):
             else:
                 pass
 
+    @property
+    def config(self) -> ConfigSimulation:
+        return self._config.copy
+    
+    @config.setter
+    def config(self, new_simulation_config: ConfigSimulation) -> None:
+        self._config = new_simulation_config
+        #for particle in self:
+        #    particle.config = new_simulation_config
+        ic("Config updated")
+            
     # --- METHODS ---
-
-    # --- SETTING METHODS ---
-
-    def update_simulation_properties_from_configuration(self, configuration_copy: Config) -> None:
-        self.is_adaptative = configuration_copy.simulation.adaptability.is_adaptative
-        self.adaptative_max_velocity_diff = configuration_copy.simulation.adaptability.max_velocity_diff
 
 
     # --- RETURNING METHODS ---
@@ -124,24 +129,16 @@ class ParticleSpace(list):
     def reduced_position_history_array(self, steps_relation: int = 1) -> tuple[np.ndarray, ...]:
         return tuple(particle.position_history[::steps_relation] for particle in self)
     
-    def check_adaptative_ok(self, time_step: float, 
-                            **adapatative_conditionals,
-                          ) -> bool:
+    def check_adaptative_ok(self, time_step: float) -> bool:
         """Return wheter the  tuple of the velocity difference arrays for each particle in the space.
         
         Arguments:
         time_step: [s] the time step (to advance each particle) that will be checked
 
-        Keywords arguments:
-        max_velocity_diff: the max velocity different that will be allowed to occur in a time step (default None -> it isn't checked)
-        adaptative_percentile: the percentile in the velocity_diff_history that will be detected as non-ok if adaptative_deviation is high enough (default None -> it isn't checked)
-        adaptative_deviation: the standard deviation in the velocity_diff against velocity_diff_history that will be detected as non-ok if adaptative_percentile is high enough
-
         Returns:
         True if the step size is okay, False if it should be shorter
         """
-        ic(adapatative_conditionals)
-        return all((particle.check_adaptative_ok(time_step, **adapatative_conditionals) for particle in self))
+        return all((particle.check_adaptative_ok(time_step, self.config.adaptability) for particle in self))
 
     # --- INITIALASING METHODS ---
 
@@ -174,7 +171,7 @@ class ParticleSpace(list):
         self.apply_couple_forces_array()
 
     def adapatative_recursive_iteration(self, time_step: float) -> None:
-        if self.check_adaptative_ok(time_step, max_velocity_diff = self.adaptative_max_velocity_diff):
+        if self.check_adaptative_ok(time_step):
             self.advance_particles_time_step(time_step)
         else:
             self.is_being_adaptative = True
@@ -210,9 +207,9 @@ class ParticleSpace(list):
         numer_of_time_steps: [s] the number of time steps to advance each particle.
         time_step: [s] the time step to advance each particle.
         """
-        if not self.is_adaptative:
+        if not self.config.adaptability.is_adaptative:
             for _ in range(numer_of_time_steps):
-                self.iterate_time_step(time_step,)
+                self.iterate_time_step(time_step)
         else: 
             for _ in range(numer_of_time_steps):
                 self.adapatative_iterate_time_step(time_step)

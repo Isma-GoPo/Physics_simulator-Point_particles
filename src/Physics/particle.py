@@ -5,7 +5,9 @@ from icecream import ic
 
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from plotting.dot import PlottingDot
+from settings.config_subclasses import ConfigAdapt
+from settings import CONFIGURATION
+#from plotting.dot import PlottingDot
 
 class Particle:
     def __init__(self, mass: float, 
@@ -128,19 +130,18 @@ class Particle:
 
 
     def check_adaptative_ok(self, time_step: float, 
-                         max_velocity_diff: float | None = None,
-                         adaptative_percentile: float | None = None,
-                         adaptative_deviation: float | None = None,
+                            adaptability_config: ConfigAdapt = CONFIGURATION.simulation.adaptability,
                           ) -> bool:
         """Return wheter the  tuple of the velocity difference arrays for each particle in the space.
         
         Arguments:
-        time_step: [s] the time step (to advance each particle) that will be checked
+        - time_step: [s] the time step (to advance each particle) that will be checked
 
         Keywords arguments:
-        max_velocity_diff: the max velocity different that will be allowed to occur in a time step (default None -> it isn't checked)
-        adaptative_percentile: the percentile in the velocity_diff_history that will be detected as non-ok if adaptative_deviation is high enough (default None -> it isn't checked)
-        adaptative_deviation: the standard deviation in the velocity_diff against velocity_diff_history that will be detected as non-ok if adaptative_percentile is high enough
+        - adaptability_config: Config instance that defines:
+          - max_velocity_diff: the max velocity different that will be allowed to occur in a time step (default None -> it isn't checked)
+          - adaptative_percentile: the percentile in the velocity_diff_history that will be detected as non-ok if adaptative_deviation is high enough (default None -> it isn't checked)
+          - adaptative_deviation: the standard deviation in the velocity_diff against velocity_diff_history that will be detected as non-ok if adaptative_percentile is high enough
 
         Returns:
         True if the step size is okay, False if it should be shorter
@@ -148,18 +149,18 @@ class Particle:
         
         # Ordered by computational cost
 
-        if max_velocity_diff is not None:
-            ok_velocity_diff = self._check_adpatative_by_velocity_diff(time_step, max_velocity_diff)
+        if adaptability_config.max_velocity_diff is not None:
+            ok_velocity_diff = self._check_adpatative_by_velocity_diff(time_step, adaptability_config.max_velocity_diff)
             if not ok_velocity_diff:
                 return False
         
-        if adaptative_percentile is not None and len(self._velocity_diff_history) >= 10: # Because percentile of less doesn't make sense
-            ok_adaptative_percentile = self._check_adpatative_by_percentile(time_step, adaptative_percentile)
+        if adaptability_config.max_velocity_diff is not None and len(self._velocity_diff_history) >= 10: # Because percentile of less doesn't make sense
+            ok_adaptative_percentile = self._check_adpatative_by_percentile(time_step, adaptability_config.max_adaptative_percentile)
             if not ok_adaptative_percentile:
                 return False
             
-        if adaptative_deviation is not None and len(self._velocity_diff_history) >= 2: # Because deviation of less doesn't make sense
-            ok_adaptative_deviation = self._check_adpatative_by_deviation(time_step, adaptative_deviation)
+        if adaptability_config.max_velocity_diff is not None and len(self._velocity_diff_history) >= 2: # Because deviation of less doesn't make sense
+            ok_adaptative_deviation = self._check_adpatative_by_deviation(time_step, adaptability_config.max_adaptative_deviation)
             if not ok_adaptative_deviation:
                 return False
         
