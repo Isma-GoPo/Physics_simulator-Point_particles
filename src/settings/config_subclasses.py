@@ -13,7 +13,7 @@ from .nestedhash import NestedHash
 
 class ConfigAdapt(NestedHash):
     def __init__(self) -> None:
-        self.is_adaptative = bool()
+        self.is_adaptive = bool()
         self.max_percentile = float()
         self.max_deviation = float()
         self.max_velocity_diff = float()

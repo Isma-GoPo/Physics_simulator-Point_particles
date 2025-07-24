@@ -7,7 +7,7 @@ from icecream import ic
 
 
 # My modules
-from .particle import Particle
+from physics.particle import Particle
 # Relative imports
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -30,7 +30,7 @@ class ParticleSpace(list):
         self.config = simulation_config
         self._life_time = 0.0
         
-        self._is_being_adaptative = False
+        self._is_being_adaptive = False
 
     # --- PROPERTIES ---
     
@@ -72,16 +72,16 @@ class ParticleSpace(list):
         return self._life_time
     
     @property
-    def is_being_adaptative(self) -> bool:
-        return self._is_being_adaptative
+    def is_being_adaptive(self) -> bool:
+        return self._is_being_adaptive
 
-    @is_being_adaptative.setter
-    def is_being_adaptative(self, state: bool) -> None:
+    @is_being_adaptive.setter
+    def is_being_adaptive(self, state: bool) -> None:
         state = bool(state)
-        if state != self._is_being_adaptative:    # Only works if it alternate it state
-            self._is_being_adaptative = state
+        if state != self._is_being_adaptive:    # Only works if it alternate it state
+            self._is_being_adaptive = state
             for particle in self:
-                particle.is_being_adaptative = state
+                particle.is_being_adaptive = state
             
             if state == True:
                 pass
@@ -129,7 +129,7 @@ class ParticleSpace(list):
     def reduced_position_history_array(self, steps_relation: int = 1) -> tuple[np.ndarray, ...]:
         return tuple(particle.position_history[::steps_relation] for particle in self)
     
-    def check_adaptative_ok(self, time_step: float) -> bool:
+    def check_adaptive_ok(self, time_step: float) -> bool:
         """Return wheter the  tuple of the velocity difference arrays for each particle in the space.
         
         Arguments:
@@ -138,7 +138,7 @@ class ParticleSpace(list):
         Returns:
         True if the step size is okay, False if it should be shorter
         """
-        return all((particle.check_adaptative_ok(time_step, self.config.adaptability) for particle in self))
+        return all((particle.adaptaptability.check_adaptive_ok(time_step) for particle in self))
 
     # --- INITIALASING METHODS ---
 
@@ -171,10 +171,10 @@ class ParticleSpace(list):
         self.apply_couple_forces_array()
 
     def adapatative_recursive_iteration(self, time_step: float) -> None:
-        if self.check_adaptative_ok(time_step):
+        if self.check_adaptive_ok(time_step):
             self.advance_particles_time_step(time_step)
         else:
-            self.is_being_adaptative = True
+            self.is_being_adaptive = True
             lower_time_step = time_step/2
             
             self.adapatative_recursive_iteration(lower_time_step)
@@ -185,7 +185,7 @@ class ParticleSpace(list):
         self.apply_all_forces_array()
         self.adapatative_recursive_iteration(time_step)
         self._life_time += time_step
-        self.is_being_adaptative = False
+        self.is_being_adaptive = False
 
     def iterate_time_step(self, time_step: float = 1.) -> None:
         """Advance all particles in the space for the given steps operating with the given functions.
@@ -207,7 +207,7 @@ class ParticleSpace(list):
         numer_of_time_steps: [s] the number of time steps to advance each particle.
         time_step: [s] the time step to advance each particle.
         """
-        if not self.config.adaptability.is_adaptative:
+        if not self.config.adaptability.is_adaptive:
             for _ in range(numer_of_time_steps):
                 self.iterate_time_step(time_step)
         else: 

@@ -17,9 +17,7 @@ from constants import USER_SETTING_DICT
 
 CONFIGURATION.update(USER_SETTING_DICT)
 
-
-# Running the file
-if __name__=="__main__":
+def main():
     #space = utils.init_space.circular_motion_decelerating_particle()
     #space, custom_settings  = utils.init_space.orbiting_decelerating_particles()
     space, custom_settings  = utils.init_space.two_particles_from_repose()
@@ -31,7 +29,13 @@ if __name__=="__main__":
     if CONFIGURATION.simulation.could_crass:    
         raise Exception("Too many time steps could crash")
     
+    space.iterate_time_step(CONFIGURATION.simulation.time_step)
     space.run_simulation(CONFIGURATION.simulation.number_of_time_steps, CONFIGURATION.simulation.time_step)  
     
     print(CONFIGURATION)
     print_animated_simulation_by_space(space) 
+    
+
+# Running the file
+if __name__=="__main__":
+    main()

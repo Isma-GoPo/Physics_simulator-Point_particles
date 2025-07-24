@@ -5,6 +5,7 @@ simulation:
   adaptability:
     is_adaptative: True
     max_velocity_diff: 1e-3 # meassure the adapatative accuracy
+    max_deviation: 2
 plotting: 
   plotting_time: 10
   refresh_rate: 20

@@ -7,10 +7,12 @@ The package includes:
 - 'dynamics' package: contains physics/dynamic operations which take one or couple particles as arguments and operate on them.
 """
 
+from .adaptability_manager import AdaptabilityManager
 from .particle import Particle
 from .particle_space import ParticleSpace
 from .physics_constants import *
 from .dynamics import *
+
 
 # from . import linearalgebra
 
