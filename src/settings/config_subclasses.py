@@ -14,9 +14,11 @@ from .nestedhash import NestedHash
 class ConfigAdapt(NestedHash):
     def __init__(self) -> None:
         self.is_adaptive = bool()
-        self.max_percentile = float()
+        self.max_quantile = float()
         self.max_deviation = float()
         self.max_velocity_diff = float()
+        self.max_relative_log_diff = float()
+    
 
     @property
     def max_absolute_value(self) -> float:

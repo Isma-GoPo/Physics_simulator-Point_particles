@@ -27,8 +27,8 @@ class AdaptabilityManager:
         Possitional-Keyword arguments:
         - adaptive_config: Config instance that defines:
           - max_absolute_value: the max velocity different that will be allowed to occur in a time step (default None -> it isn't checked)
-          - max_percentile: the percentile in the velocity_diff_history that will be detected as non-ok if adaptive_deviation is high enough (default None -> it isn't checked)
-          - max_deviation: the standard deviation in the velocity_diff against velocity_diff_history that will be detected as non-ok if adaptive_percentile is high enough
+          - max_quantile: the quantile in the velocity_diff_history that will be detected as non-ok if adaptive_deviation is high enough (default None -> it isn't checked)
+          - max_deviation: the standard deviation in the velocity_diff against velocity_diff_history that will be detected as non-ok if adaptive_quantile is high enough
         - 
         """            
         self.config: ConfigAdapt = adaptativility_config
@@ -36,13 +36,14 @@ class AdaptabilityManager:
         self.get_value: Callable[[float], float] = get_value_function # when called (no arguments) returns a value for storing it in history
             # very prouf of using a function in this way for not having to access the Particle object
         self._value_history: np.ndarray = np.empty((0), float)
+        self._value_log_history: np.ndarray = np.empty((0), float)
 
     def store_value_in_history(self, time_step: float) -> None:
-        self._value_history = np.append(self._value_history, self.get_value(time_step))
+        if self.config.is_adaptive:
+            self._value_history = np.append(self._value_history, self.get_value(time_step))
+            self._value_log_history = np.append(self._value_log_history, np.log(self.get_value(time_step))) 
     
     # --- CHACK adaptive METHODS ---
-
-
 
     def _ckeck_corresponding_absolute_value(self, time_step: float, corresponding_absolute_value: float) -> bool:
         return self.get_value(time_step) < corresponding_absolute_value
@@ -58,6 +59,10 @@ class AdaptabilityManager:
             is_ok:bool = actual_absolute_value < corresponding_absolute_value
             if not is_ok:
                 ic(time_step, corresponding_absolute_value, actual_absolute_value)
+                #ic(self._value_history)
+                #ic(time_step)
+                
+                pass
             return is_ok
         return wrapper_function
 
@@ -66,15 +71,29 @@ class AdaptabilityManager:
         return float(self.config.max_absolute_value)
 
     @_check_adaptive_ok_decorator
-    def _check_adpatative_by_percentile(self) -> float:
-        return float(np.quantile(self._value_history, self.config.max_percentile, method='higher'))
+    def _check_adpatative_by_quantile(self) -> float:
+        return float(np.quantile(self._value_history, self.config.max_quantile, method='higher'))
 
     @_check_adaptive_ok_decorator
     def _check_adpatative_by_deviation(self) -> float:
         return float(np.mean(self._value_history) + self.config.max_deviation * np.std(self._value_history))
+    
+    @_check_adaptive_ok_decorator
+    def _check_adpatative_by_relative_log_diff(self) -> float:
+        IGNORED_EXTREMES = 0.1 # in %
+        log_diff = np.percentile(self._value_log_history, 100-IGNORED_EXTREMES, method="higher") - np.percentile(self._value_log_history, IGNORED_EXTREMES, method="lower")
+        log_mean = np.mean(self._value_log_history[:-2])
+        log_value = log_mean + log_diff * self.config.max_relative_log_diff
+        #ic(self._value_log_history[:-2])
+        #ic(log_value, log_mean, np.mean(self._value_history), log_diff)
+        #ic(np.exp(log_mean), np.mean(self._value_history))
+        return float(np.exp(log_value))
 
 
     def check_adaptive_ok(self, time_step: float) -> bool:
+        if not self.config.is_adaptive:
+            return True
+        
         # Ordered by computational cost
 
         if self.config.max_absolute_value is not None \
@@ -83,12 +102,20 @@ class AdaptabilityManager:
             if not ok_absolute_value:
                 return False
         
-        if self.config.max_percentile is not None \
-            and self.config.max_percentile < 1. \
-            and len(self._value_history >= 10): # Because percentile of less doesn't make sense
-            ok_percentile = self._check_adpatative_by_percentile(time_step)
-            if not ok_percentile:
+        if self.config.max_quantile is not None \
+            and self.config.max_quantile < 1. \
+            and len(self._value_history >= 10): # Because quantile of less doesn't make sense
+            ok_quantile = self._check_adpatative_by_quantile(time_step)
+            if not ok_quantile:
                 return False
+            
+        if self.config.max_relative_log_diff is not None \
+            and self.config.max_relative_log_diff > 0. \
+            and len(self._value_history) >= 6: # Because function of less doesn't make sense
+            ok = self._check_adpatative_by_relative_log_diff(time_step)
+            if not ok:
+                return False
+            
         
         if self.config.max_deviation is not None \
             and self.config.max_deviation > 0. \
@@ -106,7 +133,7 @@ if __name__ == "__main__":
 
     config.update({
         "max_velocity_diff": 19,
-        "max_percentile": None,
+        "max_quantile": None,
         "max_deviation": 1.9
     })
 
@@ -118,7 +145,7 @@ if __name__ == "__main__":
 
 
     ic(config)
-    if (config.max_percentile is not None \
-        and config.max_percentile < 0.9) \
+    if (config.max_quantile is not None \
+        and config.max_quantile < 0.9) \
         and True:
         print(True)

@@ -33,10 +33,11 @@ class Config(NestedHash):
         self.simulation.adaptability = configs.ConfigAdapt()
         self.simulation.adaptability.is_adaptive = True
             # If True, the simulation will be adaptive
-        self.simulation.adaptability.max_percentile = 1.
-        self.simulation.adaptability.max_deviation = 0.   # If deviation is <= 0, it doesn't check for it
         self.simulation.adaptability.max_velocity_diff = 100.
+        self.simulation.adaptability.max_quantile = 1.
+        self.simulation.adaptability.max_deviation = 0.   # If deviation is <= 0, it doesn't check for it
             # defines the the adapatative accuracy
+        self.simulation.adaptability.max_relative_log_diff = 0. # If deviation is <= 0, it doesn't check for it
 
         self.plotting = configs.ConfigPlotting()
         self.plotting.plotting_time = 10.0

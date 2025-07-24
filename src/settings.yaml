@@ -5,7 +5,8 @@ simulation:
   adaptability:
     is_adaptative: True
     max_velocity_diff: #1e-3 # meassure the adapatative accuracy
-    max_percentile: 0.99
+    max_relative_log_diff: 2 #2.573 # times percentileHIGH-percentileLOW get multiplied from mean to value
+    max_quantile: nan # 0.99
     max_deviation: nan #900
 plotting: 
   plotting_time: 10
