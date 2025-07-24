@@ -13,6 +13,9 @@ import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from settings.config_subclasses import ConfigSimulation 
 from settings.settings import Config
+from utils import print_run_time
+
+
 
 
 
@@ -197,7 +200,7 @@ class ParticleSpace(list):
         self.advance_particles_time_step(time_step)
         self._life_time += time_step
 
-
+    @print_run_time
     def run_simulation(self, 
                        numer_of_time_steps: int, 
                        time_step: float = 1.) -> None:

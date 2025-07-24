@@ -49,11 +49,16 @@ class AdaptabilityManager:
 
     @staticmethod
     def _check_adaptive_ok_decorator(get_value_by_function: Callable[[InstanceType], float]) -> Callable[[InstanceType, float], bool]:
+        """Transform a get_value function to a function that takes the time_step and check (return True if ok, False if not
+        if the value getted is ok for the given time step."""
         @wraps(get_value_by_function)
         def wrapper_function(self, time_step: float) -> bool:
             corresponding_absolute_value = get_value_by_function(self)
             actual_absolute_value = self.get_value(time_step)
-            return actual_absolute_value < corresponding_absolute_value
+            is_ok:bool = actual_absolute_value < corresponding_absolute_value
+            if not is_ok:
+                ic(time_step, corresponding_absolute_value, actual_absolute_value)
+            return is_ok
         return wrapper_function
 
     @_check_adaptive_ok_decorator
@@ -90,6 +95,7 @@ class AdaptabilityManager:
             and len(self._value_history) >= 2: # Because deviation of less doesn't make sense
             ok_deviation = self._check_adpatative_by_deviation(time_step)
             if not ok_deviation:
+                #ic(ok_deviation)
                 return False
         
         return True

@@ -2,6 +2,10 @@
 
 import numpy as np
 from icecream import ic
+from functools import wraps
+from typing import Any, Callable, TypeVar, ParamSpec
+P = ParamSpec('P')  # For type hinting *args, **kwargs
+InstanceType = TypeVar('InstanceType') # When decorating a method *within* AdaptabilityManager, InstanceType will be AdaptabilityManager
 
 # My modules
 from physics.adaptability_manager import AdaptabilityManager
@@ -124,7 +128,14 @@ class Particle:
         value = float( np.linalg.norm(self.acceleration_to_apply) * time_step )
         return value
     
-
+    # decorator
+    @staticmethod
+    def run_if_not_being_adaptative(adaptative_dependant_function: Callable[..., Any]) -> Callable[..., Any | None]:
+        @wraps(adaptative_dependant_function)
+        def wrapper_function(self, *args, **kwargs) -> Any | None:
+            if not self.is_being_adaptive:
+                return adaptative_dependant_function(self, *args, **kwargs)
+        return wrapper_function
 
     # --- OPERATING METHODS ---
 
@@ -174,10 +185,16 @@ class Particle:
         """
         self.acceleration += applied_acceleration
 
+    @run_if_not_being_adaptative
     def store_position_in_history(self) -> None:
         """Stores the current position in the position history."""
-        if not self.is_being_adaptive:
-            self._position_history = np.vstack((self.position_history, [self.position]))
+        self._position_history = np.vstack((self.position_history, [self.position]))
+
+    @run_if_not_being_adaptative
+    def store_velocity_diff_in_history(self, time_step: float) -> None:
+        """Stores the velocity difference in the adaptability propierty history."""
+        self.adaptaptability.store_value_in_history(time_step)
+
 
     def store_current_state(self) -> None:
         """Stores the current position in history and velocity and acceleration as the last ones and reset them."""
@@ -193,6 +210,7 @@ class Particle:
         Keyword arguments:
         time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
         """
+        self.store_velocity_diff_in_history(time_step)
         self.do_accelerate(time_step)
         self.do_translate(time_step)
         self.store_current_state()
