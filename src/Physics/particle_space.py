@@ -12,7 +12,7 @@ from physics.particle import Particle
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from settings.config_subclasses import ConfigSimulation 
-from settings.settings import Config
+from settings import Config, CONFIGURATION
 from utils import print_run_time
 
 
@@ -24,7 +24,7 @@ class ParticleSpace(list):
     def __init__(self, 
                  *particles: tuple[Particle], 
                  single_forces_array: tuple[Callable[[Particle], np.ndarray], ...] | None = None,
-                 simulation_config: ConfigSimulation = Config().simulation,
+                 simulation_config: ConfigSimulation = CONFIGURATION.simulation,
                  couple_forces_array: tuple[Callable[[Particle, Particle], np.ndarray], ...] | None = None,
                  ) -> None:
         super().__init__(particles)

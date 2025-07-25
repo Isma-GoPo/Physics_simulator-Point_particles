@@ -15,7 +15,10 @@ from space_plotting import print_animated_simulation_by_space
 from settings import CONFIGURATION
 from constants import USER_SETTING_DICT
 
+ic(CONFIGURATION)
+
 CONFIGURATION.update(USER_SETTING_DICT)
+ic(CONFIGURATION)
 
 def main():
     #space = utils.init_space.circular_motion_decelerating_particle()
@@ -29,7 +32,7 @@ def main():
     if CONFIGURATION.simulation.could_crass:    
         raise Exception("Too many time steps could crash")
     
-    space.iterate_time_step(CONFIGURATION.simulation.time_step)
+    
     space.run_simulation(CONFIGURATION.simulation.number_of_time_steps, CONFIGURATION.simulation.time_step)  
     
     print(CONFIGURATION)

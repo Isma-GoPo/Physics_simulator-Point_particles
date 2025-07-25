@@ -105,23 +105,31 @@ class NestedHash():
         """
         for key, new_value in new_dictionary.items():
             key = self._sanitase_key(key)
+            
             if not hasattr(self, key):
                 setattr(self, key, new_value)
+                continue
+            if new_value is None:
+                continue
+            
+            old_value = getattr(self, key)
+            if old_value is None:
+                setattr(self, key, new_value)
+                continue
+            
+            if isinstance(old_value, NestedHash):
+                if isinstance(new_value, dict):
+                    old_value.update(new_value)
+            elif type(old_value) == type(new_value):
+                setattr(self, key, new_value)
             else:
-                old_value = getattr(self, key)
-                if new_value is None:
-                    continue
-                if isinstance(old_value, NestedHash):
-                    if isinstance(new_value, dict):
-                        old_value.update(new_value)
-                    else:
-                        continue
-                else:
-                    if old_value is None:
-                        setattr(self, key, new_value)
-                    else:
-                        typeclass = type(old_value)
-                        setattr(self, key, typeclass(new_value))
+                try:
+                    typeclass = type(old_value)
+                    new_value = typeclass(new_value)
+                    setattr(self, key, new_value)
+                    ic(key, old_value, new_value)
+                except:
+                    raise TypeError(f"You are trying to update a `{self.__class__.__name__}` instance old value `{repr(old_value)}` with a new value `{repr(new_value)}`")
     
     
 

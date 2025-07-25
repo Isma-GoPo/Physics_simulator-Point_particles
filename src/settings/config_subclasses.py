@@ -18,7 +18,7 @@ class ConfigAdapt(NestedHash):
         self.max_deviation = float()
         self.max_velocity_diff = float()
         self.max_relative_log_diff = float()
-    
+        self.min_time_step = float()
 
     @property
     def max_absolute_value(self) -> float:
@@ -31,6 +31,22 @@ class ConfigSimulation(NestedHash):
         self.time_step = float()
         self.max_allowed_force = float()
         self.adaptability = ConfigAdapt()
+
+    @property
+    def min_relative_time_step_reduction(self) -> float:
+        try: 
+            return_value =  self.time_step / self.adaptability.min_time_step
+        except:
+            return_value =  self.time_step
+        return return_value
+    
+    @min_relative_time_step_reduction.setter
+    def min_relative_time_step_reduction(self, value: float) -> None:
+        try:
+            set_value = self.time_step / value
+        except:
+            set_value = self.time_step
+        self.adaptability.min_time_step = set_value
     
     @property
     def number_of_time_steps(self) -> int:
@@ -41,7 +57,6 @@ class ConfigSimulation(NestedHash):
     def could_crass(self) -> bool:
         could_crass = int(self.simulation_time / self.time_step) > 100_000 # type: ignore
         return could_crass
-
 
 class ConfigPlotting(NestedHash):
     def __init__(self) -> None:

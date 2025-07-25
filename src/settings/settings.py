@@ -38,6 +38,8 @@ class Config(NestedHash):
         self.simulation.adaptability.max_deviation = 0.   # If deviation is <= 0, it doesn't check for it
             # defines the the adapatative accuracy
         self.simulation.adaptability.max_relative_log_diff = 0. # If deviation is <= 0, it doesn't check for it
+        self.simulation.adaptability.min_time_step = self.simulation.time_step / self.simulation.min_relative_time_step_reduction
+            # Overwrite min_relative_time_step_reduction
 
         self.plotting = configs.ConfigPlotting()
         self.plotting.plotting_time = 10.0
