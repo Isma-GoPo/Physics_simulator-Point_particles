@@ -58,7 +58,7 @@ class AdaptabilityManager:
             actual_absolute_value = self.get_value(time_step)
             is_ok:bool = actual_absolute_value < corresponding_absolute_value
             if not is_ok:
-                ic(time_step, corresponding_absolute_value, actual_absolute_value)
+                #ic(time_step, corresponding_absolute_value, actual_absolute_value)
                 #ic(self._value_history)
                 #ic(time_step)
                 
@@ -94,6 +94,11 @@ class AdaptabilityManager:
         if not self.config.is_adaptive:
             return True
         
+        if time_step/2 < self.config.min_time_step:
+            ic("min time step reached")
+            return True
+        
+
         # Ordered by computational cost
 
         if self.config.max_absolute_value is not None \

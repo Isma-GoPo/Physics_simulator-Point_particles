@@ -38,7 +38,7 @@ class Config(NestedHash):
         self.simulation.adaptability.max_deviation = 0.   # If deviation is <= 0, it doesn't check for it
             # defines the the adapatative accuracy
         self.simulation.adaptability.max_relative_log_diff = 0. # If deviation is <= 0, it doesn't check for it
-        self.simulation.adaptability.min_time_step = self.simulation.time_step / self.simulation.min_relative_time_step_reduction
+        self.simulation.adaptability.min_time_step = self.simulation.time_step / 10
             # Overwrite min_relative_time_step_reduction
 
         self.plotting = configs.ConfigPlotting()
@@ -56,4 +56,4 @@ class Config(NestedHash):
         self.plotting.dot_sizes.exponent_factor = 0.666     
 
 CONFIGURATION = Config() # Just one istance of the object shared in all modules
-CONFIGURATION.update(USER_SETTING_DICT)
+#CONFIGURATION.update(USER_SETTING_DICT)

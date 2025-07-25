@@ -1,18 +1,18 @@
 simulation:
   simulation_time:   # in secs
-  time_step: 
-  min_relative_time_step_reduction: 1e3 # from adaptative but needs time step
-  #max_allowed_force: 10
+  #time_step: 10.
+  #max_allowed_force: 10.
+  min_relative_time_step_reduction: 100000. # from adaptative but needs time step
   adaptability:
     is_adaptative: True
-    min_time_step:  2 # Overwrite min_relative_time_step_reduction
+    #min_time_step:  2. # Overwrite min_relative_time_step_reduction
     max_velocity_diff: #1e-3 # meassure the adapatative accuracy
-    #max_relative_log_diff: 2 #2.573 # times percentileHIGH-percentileLOW get multiplied from mean to value
+    max_relative_log_diff: 1.5 #2.573 # times percentileHIGH-percentileLOW get multiplied from mean to value
     max_quantile: # 0.99
     max_deviation: #900
 plotting: 
-  plotting_time: 10
-  refresh_rate: 20
+  plotting_time: 10.
+  refresh_rate: 20.
   do_repeat: off
   dot_sizes:
     min: 15.0

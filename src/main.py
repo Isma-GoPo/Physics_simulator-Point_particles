@@ -2,6 +2,8 @@
 import numpy as np
 from icecream import ic
 import os
+from pprint import pprint
+
 # clear terminal
 os.system('cls')
 
@@ -15,10 +17,11 @@ from space_plotting import print_animated_simulation_by_space
 from settings import CONFIGURATION
 from constants import USER_SETTING_DICT
 
-ic(CONFIGURATION)
 
+ic(CONFIGURATION)
 CONFIGURATION.update(USER_SETTING_DICT)
 ic(CONFIGURATION)
+
 
 def main():
     #space = utils.init_space.circular_motion_decelerating_particle()
@@ -32,7 +35,7 @@ def main():
     if CONFIGURATION.simulation.could_crass:    
         raise Exception("Too many time steps could crash")
     
-    
+    pprint(CONFIGURATION.as_dictionary)
     space.run_simulation(CONFIGURATION.simulation.number_of_time_steps, CONFIGURATION.simulation.time_step)  
     
     print(CONFIGURATION)

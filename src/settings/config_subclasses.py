@@ -28,9 +28,22 @@ class ConfigAdapt(NestedHash):
 class ConfigSimulation(NestedHash):
     def __init__(self) -> None:
         self.simulation_time = float()
-        self.time_step = float()
         self.max_allowed_force = float()
         self.adaptability = ConfigAdapt()
+        self._time_step = float() # private because updates `adaptability`
+
+    @property
+    def time_step(self) -> float:
+        return self._time_step
+
+    @time_step.setter
+    def time_step(self, value: float) -> None:
+        last_value = self.time_step
+        self._time_step = value
+        if last_value == 0.:
+            last_value = 1.
+        self.adaptability.min_time_step = self.adaptability.min_time_step / last_value * value
+
 
     @property
     def min_relative_time_step_reduction(self) -> float:
@@ -42,11 +55,10 @@ class ConfigSimulation(NestedHash):
     
     @min_relative_time_step_reduction.setter
     def min_relative_time_step_reduction(self, value: float) -> None:
-        try:
-            set_value = self.time_step / value
-        except:
-            set_value = self.time_step
-        self.adaptability.min_time_step = set_value
+        ic(self.time_step, value)
+        if value == 0.:
+            value = 1.
+        self.adaptability.min_time_step = self.time_step / value
     
     @property
     def number_of_time_steps(self) -> int:

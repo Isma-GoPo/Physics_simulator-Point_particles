@@ -39,7 +39,7 @@ class NestedHash():
     
     @property
     def as_dictionary(self) -> dict[str, Any]:
-        dict = self.__dict__
+        dict = self.__dict__.copy()
         for key, value in dict.items():
             if isinstance(value, NestedHash): # Also True if it is a subclass
                 dict[key] = value.as_dictionary
@@ -115,8 +115,7 @@ class NestedHash():
             old_value = getattr(self, key)
             if old_value is None:
                 setattr(self, key, new_value)
-                continue
-            
+                continue            
             if isinstance(old_value, NestedHash):
                 if isinstance(new_value, dict):
                     old_value.update(new_value)
@@ -125,9 +124,9 @@ class NestedHash():
             else:
                 try:
                     typeclass = type(old_value)
-                    new_value = typeclass(new_value)
-                    setattr(self, key, new_value)
-                    ic(key, old_value, new_value)
+                    forced_new_value = typeclass(new_value)
+                    setattr(self, key, forced_new_value)
+                    #print(f"ALERT: frocing type of old value: {repr(key)} of {type(old_value)}: {repr(new_value)} of {type(new_value)}")
                 except:
                     raise TypeError(f"You are trying to update a `{self.__class__.__name__}` instance old value `{repr(old_value)}` with a new value `{repr(new_value)}`")
     
