@@ -141,7 +141,7 @@ class ParticleSpace(list):
         Returns:
         True if the step size is okay, False if it should be shorter
         """
-        return all((particle.adaptaptability.check_adaptive_ok(time_step) for particle in self))
+        return all(particle.adaptaptability.check_adaptive_ok(time_step) for particle in self)
 
     # --- INITIALASING METHODS ---
 
@@ -210,6 +210,9 @@ class ParticleSpace(list):
         numer_of_time_steps: [s] the number of time steps to advance each particle.
         time_step: [s] the time step to advance each particle.
         """
+        if CONFIGURATION.simulation.could_crass:    
+            raise Exception("Too many time steps could crash")
+        
         if not self.config.adaptability.is_adaptive:
             for _ in range(numer_of_time_steps):
                 self.iterate_time_step(time_step)

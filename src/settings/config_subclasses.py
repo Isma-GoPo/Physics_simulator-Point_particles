@@ -19,6 +19,7 @@ class ConfigAdapt(NestedHash):
         self.max_velocity_diff = float()
         self.max_relative_log_diff = float()
         self.min_time_step = float()
+        self.quantile_ignored_extremes = float()
 
     @property
     def max_absolute_value(self) -> float:

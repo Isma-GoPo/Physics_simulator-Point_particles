@@ -128,6 +128,12 @@ class Particle:
         value = float( np.linalg.norm(self.acceleration_to_apply) * time_step )
         return value
     
+    def set_acceleration_from_velocity_differential(self, time_step: float = 1.0) -> None:
+            if self.adaptaptability.do_last_failed:
+                max_acceleration = self.adaptaptability.last_threshold_absolute_value / time_step
+                self.acceleration = self.acceleration/np.linalg.norm(self.acceleration) * max_acceleration
+            #ic(self.acceleration)
+    
     # decorator
     @staticmethod
     def run_if_not_being_adaptative(adaptative_dependant_function: Callable[..., Any]) -> Callable[..., Any | None]:
@@ -211,6 +217,8 @@ class Particle:
         time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
         """
         self.store_velocity_diff_in_history(time_step)
+        if time_step/2 < self.adaptaptability.config.min_time_step:
+            self.set_acceleration_from_velocity_differential(time_step)
         self.do_accelerate(time_step)
         self.do_translate(time_step)
         self.store_current_state()

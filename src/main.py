@@ -20,22 +20,30 @@ from constants import USER_SETTING_DICT
 
 ic(CONFIGURATION)
 CONFIGURATION.update(USER_SETTING_DICT)
-ic(CONFIGURATION)
+#ic(CONFIGURATION)
+
+ic.disable()
 
 
 def main():
     #space = utils.init_space.circular_motion_decelerating_particle()
-    #space, custom_settings  = utils.init_space.orbiting_decelerating_particles()
-    space, custom_settings  = utils.init_space.two_particles_from_repose()
+    space, custom_settings  = utils.init_space.orbiting_decelerating_particles()
+    #space, custom_settings  = utils.init_space.two_particles_from_repose()
     CONFIGURATION.update(custom_settings)
     
+    #CONFIGURATION.simulation.update(
+    #    {"simulation_time": 192426,
+    #    "time_step": 10 }) #96213*2
+
     space.config = CONFIGURATION.simulation
 
-    ic(CONFIGURATION)
-    if CONFIGURATION.simulation.could_crass:    
-        raise Exception("Too many time steps could crash")
+    #ic(CONFIGURATION)
+    pprint(CONFIGURATION.simulation.as_dictionary)
     
-    pprint(CONFIGURATION.as_dictionary)
+    pprint(space[0].adaptaptability.config.as_dictionary)
+    pprint(space[1].adaptaptability.config.as_dictionary)
+    
+
     space.run_simulation(CONFIGURATION.simulation.number_of_time_steps, CONFIGURATION.simulation.time_step)  
     
     print(CONFIGURATION)

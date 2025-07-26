@@ -6,7 +6,11 @@ from typing import Any, TypeVar
 InstanceType = TypeVar('InstanceType') # When decorating a method *within* AdaptabilityManager, InstanceType will be AdaptabilityManager.
 from icecream import ic
 from functools import partial, wraps
+from deprecated import deprecated
+from pprint import pprint
 
+# turn off -ic()-
+#ic.disable()
 
 # My modules
 # Relative imports
@@ -25,6 +29,8 @@ class AdaptabilityManager:
         """Init a 'AdaptabilityManager' object
 
         Possitional-Keyword arguments:
+        - get_value_function: a function that when called return an absolute (positive) value which decrease proportionally with time_step
+          It return the value that `AdaptabilityManager` study 
         - adaptive_config: Config instance that defines:
           - max_absolute_value: the max velocity different that will be allowed to occur in a time step (default None -> it isn't checked)
           - max_quantile: the quantile in the velocity_diff_history that will be detected as non-ok if adaptive_deviation is high enough (default None -> it isn't checked)
@@ -37,120 +43,116 @@ class AdaptabilityManager:
             # very prouf of using a function in this way for not having to access the Particle object
         self._value_history: np.ndarray = np.empty((0), float)
         self._value_log_history: np.ndarray = np.empty((0), float)
+        
+        self.threshold_absolute_value: float = 0.
+        self.do_last_failed:bool = False
 
     def store_value_in_history(self, time_step: float) -> None:
         if self.config.is_adaptive:
             self._value_history = np.append(self._value_history, self.get_value(time_step))
-            self._value_log_history = np.append(self._value_log_history, np.log(self.get_value(time_step))) 
+            #self._value_log_history = np.append(self._value_log_history, np.log(self.get_value(time_step))) 
     
-    # --- CHACK adaptive METHODS ---
+    # --- CHECK adaptive METHODS ---
+    def check_adaptive_ok_by_threshold(self, threshold_absolute_value: float, time_step: float) -> bool:
+        #threshold_absolute_value
+        actual_absolute_value = self.get_value(time_step)
+        #ic(threshold_absolute_value, actual_absolute_value)
+        is_ok: bool = actual_absolute_value < threshold_absolute_value
+        if not is_ok:
+            self.do_last_failed = True
+            self.last_threshold_absolute_value = threshold_absolute_value
+            pass
+        else:
+            self.do_last_failed = False
+        return is_ok
 
-    def _ckeck_corresponding_absolute_value(self, time_step: float, corresponding_absolute_value: float) -> bool:
-        return self.get_value(time_step) < corresponding_absolute_value
-
-    @staticmethod
-    def _check_adaptive_ok_decorator(get_value_by_function: Callable[[InstanceType], float]) -> Callable[[InstanceType, float], bool]:
-        """Transform a get_value function to a function that takes the time_step and check (return True if ok, False if not
-        if the value getted is ok for the given time step."""
-        @wraps(get_value_by_function)
-        def wrapper_function(self, time_step: float) -> bool:
-            corresponding_absolute_value = get_value_by_function(self)
-            actual_absolute_value = self.get_value(time_step)
-            is_ok:bool = actual_absolute_value < corresponding_absolute_value
-            if not is_ok:
-                #ic(time_step, corresponding_absolute_value, actual_absolute_value)
-                #ic(self._value_history)
-                #ic(time_step)
-                
-                pass
-            return is_ok
-        return wrapper_function
-
-    @_check_adaptive_ok_decorator
-    def _check_adpatative_by_absolute(self) -> float:
+    def get_threshold_by_absolute(self) -> float:
+        """Returns the absolute threshold value."""
         return float(self.config.max_absolute_value)
 
-    @_check_adaptive_ok_decorator
-    def _check_adpatative_by_quantile(self) -> float:
-        return float(np.quantile(self._value_history, self.config.max_quantile, method='higher'))
+    def _get_value_by_extrapolated_quantile(self, extrapolated_quantile: float) -> float:
+        IGNORED_EXTREMES = self.config.quantile_ignored_extremes
+            # 2-1 it sweet spot (2 to 0.5)
+        relative_diff = np.percentile(self._value_history, 100-IGNORED_EXTREMES, method="higher") \
+            / np.percentile(self._value_history, IGNORED_EXTREMES, method="lower")
+        value_mean = np.mean(self._value_history[:-2])
+        value = value_mean * relative_diff * (self.config.max_quantile-0.5) # because mean is ~quantile 0.5
+        return float(value)
 
-    @_check_adaptive_ok_decorator
-    def _check_adpatative_by_deviation(self) -> float:
+    def get_threshold_by_quantile(self) -> float:
+        """Returns the quantile-based threshold value. If quantile > 1 it returns a useful extrapolation"""
+        if self.config.max_quantile <= 1.:
+            value = np.quantile(self._value_history, self.config.max_quantile, method='higher')
+        else: # self.config.max_quantile > 1.:
+            value = self._get_value_by_extrapolated_quantile(self.config.max_quantile)
+        #ic(value)
+        return float(value)
+
+    def get_threshold_by_deviation(self) -> float:
+        """Returns the deviation-based threshold value."""
         return float(np.mean(self._value_history) + self.config.max_deviation * np.std(self._value_history))
     
-    @_check_adaptive_ok_decorator
-    def _check_adpatative_by_relative_log_diff(self) -> float:
+    @deprecated("Better to use `max_quantile`>1. instead")
+    def get_threshold_by_relative_log_diff(self) -> float:
         IGNORED_EXTREMES = 0.1 # in %
-        log_diff = np.percentile(self._value_log_history, 100-IGNORED_EXTREMES, method="higher") - np.percentile(self._value_log_history, IGNORED_EXTREMES, method="lower")
+        log_diff = np.percentile(self._value_log_history, 100-IGNORED_EXTREMES, method="higher") \
+            - np.percentile(self._value_log_history, IGNORED_EXTREMES, method="lower")
         log_mean = np.mean(self._value_log_history[:-2])
-        log_value = log_mean + log_diff * self.config.max_relative_log_diff
-        #ic(self._value_log_history[:-2])
-        #ic(log_value, log_mean, np.mean(self._value_history), log_diff)
-        #ic(np.exp(log_mean), np.mean(self._value_history))
+        log_value = log_mean + log_diff * (self.config.max_relative_log_diff-0.5) # because mean is ~quantile 0.5
         return float(np.exp(log_value))
 
+    def get_worst_threshold_value(self) -> float:
+        """Returns the worst threshold value. -1 if there is no calculation possible for the threshold, so it is ckecked coorrectly"""
 
-    def check_adaptive_ok(self, time_step: float) -> bool:
-        if not self.config.is_adaptive:
-            return True
+        # Ordered by computational cost
+        worst_threshold_value = -1.
         
-        if time_step/2 < self.config.min_time_step:
-            ic("min time step reached")
-            return True
-        
-
         # Ordered by computational cost
 
         if self.config.max_absolute_value is not None \
             and self.config.max_absolute_value < np.inf:
-            ok_absolute_value = self._check_adpatative_by_absolute(time_step)
-            if not ok_absolute_value:
-                return False
-        
+            worst_threshold_value = max(worst_threshold_value, self.get_threshold_by_absolute())
+
         if self.config.max_quantile is not None \
-            and self.config.max_quantile < 1. \
-            and len(self._value_history >= 10): # Because quantile of less doesn't make sense
-            ok_quantile = self._check_adpatative_by_quantile(time_step)
-            if not ok_quantile:
-                return False
-            
-        if self.config.max_relative_log_diff is not None \
-            and self.config.max_relative_log_diff > 0. \
-            and len(self._value_history) >= 6: # Because function of less doesn't make sense
-            ok = self._check_adpatative_by_relative_log_diff(time_step)
-            if not ok:
-                return False
-            
+            and self.config.max_quantile >= 0. \
+            and len(self._value_history) >= 10: # Because quantile of less doesn't make sense
+            worst_threshold_value = max(worst_threshold_value, self.get_threshold_by_quantile())
         
         if self.config.max_deviation is not None \
             and self.config.max_deviation > 0. \
             and len(self._value_history) >= 2: # Because deviation of less doesn't make sense
-            ok_deviation = self._check_adpatative_by_deviation(time_step)
-            if not ok_deviation:
-                #ic(ok_deviation)
-                return False
+            worst_threshold_value = max(worst_threshold_value, self.get_threshold_by_deviation())
         
-        return True
+        return worst_threshold_value
+
+    def check_adaptive_ok(self, time_step: float) -> bool:
+        """Main class method to check if the time step is acceptable using all the different methods."""
+        if not self.config.is_adaptive:
+            return True
+        
+        worst_threshold_value = self.get_worst_threshold_value()
+        #ic(worst_threshold_value)
+
+        if worst_threshold_value == -1:
+            return True
+        else: 
+            self.last_threshold_absolute_value = worst_threshold_value
+            is_ok = self.check_adaptive_ok_by_threshold(worst_threshold_value, time_step)
+        
+        if time_step < self.config.min_time_step:
+            ic("min time step reached", self.last_threshold_absolute_value, self.get_value(time_step))
+            #ic(self.last_threshold_absolute_value, self.do_last_failed, np.array([self._value_history[0], self._value_history[-1]]), self.get_value(time_step))
+            return True
+        return is_ok
 
 
-if __name__ == "__main__":
-    config = CONFIGURATION.simulation.adaptability
-
-    config.update({
-        "max_velocity_diff": 19,
-        "max_quantile": None,
-        "max_deviation": 1.9
-    })
-
-    obj = AdaptabilityManager(lambda t: t, config)
-    for i in range(20):
-        ic(obj.check_adaptive_ok(i))
-        obj.store_value_in_history(i)
-    #ic(obj._value_history)
 
 
-    ic(config)
-    if (config.max_quantile is not None \
-        and config.max_quantile < 0.9) \
-        and True:
-        print(True)
+
+
+
+
+
+
+
+
