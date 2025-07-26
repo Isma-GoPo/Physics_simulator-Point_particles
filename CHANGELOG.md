@@ -1,9 +1,26 @@
 This is the log file. Its purpose is to have an idea of what I have done when I enter the project a long time later.
 
-## v0.7 
-...
+## v0.7 [2025-07-26]
+###### Summary
+Adaptability in the simulation has been improved and added complexity and options. This possibility make the particle slower but more powerfull for being precise in extreme situations that needs more time steps.
 
-Made Dot to plotting class independent of the particles itselfs
+###### AdaptabilityManager
+- `AdaptabilityManager` is a class that is contained in each particle that allow managing the adaptative steps.
+- For the user they add:
+  - Different thresholds values and functions: for a given max_absolute_value, percentile (extrapolated to >1), standard deviation
+  - `check_adaptative_ok` method for ckecking if the a magnituede (now the velocity differential) with all the different thresholds.
+  - `self.recommended_division_for_steps` for setting the adaptative steps
+  - Make so `AdaptabilityManager` returns also the number of time steps you should divide into for quickler results
+- Made it independand of the atribute (`velocity_diff`) 
+  - It takes whatever function of the particle for setting the adaptability ckecking
+  - Add a this atribute history for statistic/relative thresholds
+- When min_time_step is reached, it takes the max threshold computed value
+- The most reccomended feature is `max_quantile = 1.5~4.` toguether with `quantile_ignored_extremes = 10~1`
+
+###### Other changes
+- New `AdaptabilityConfig` class as part of `Config > ConfigSimulation`
+- Made `Dot` to plotting class independent of the particles itselfs
+- Added default config for init `orbiting_decelerating_particles` and creating `two_particles_from_repose` as setting for experimenting with adaptative simulation
 
 ## v0.6 [2025-07-22]
 ###### Summary
