@@ -61,8 +61,15 @@ def two_particles_from_repose(initial_position: np.ndarray | None = None) -> tup
     """Creates a particle space with mass=1, Vx=1 and with gravity field."""
     custom_settings = {
         "simulation": {
-            "simulation_time": 96213*1.05,
+            "simulation_time": 96213*2, #1.05,
             "time_step": 10.,
+            "min_relative_time_step_reduction": 1e3,
+            "adaptability": {
+                "is_adaptive": True,
+                "quantile_ignored_extremes": 10.,
+                "max_absolute_value": np.inf,
+            },
+            
         },
         "plotting": {
             "plotting_time": 3.,

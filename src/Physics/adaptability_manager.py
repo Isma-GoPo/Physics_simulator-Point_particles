@@ -46,6 +46,7 @@ class AdaptabilityManager:
         
         self.threshold_absolute_value: float = 0.
         self.do_last_failed:bool = False
+        self.recommended_division_for_steps:int = 2
 
     def store_value_in_history(self, time_step: float) -> None:
         if self.config.is_adaptive:
@@ -61,10 +62,18 @@ class AdaptabilityManager:
         if not is_ok:
             self.do_last_failed = True
             self.last_threshold_absolute_value = threshold_absolute_value
+            self.set_recommended_division_for_steps(time_step, actual_absolute_value, threshold_absolute_value)
+            #ic(self.recommended_division_for_steps)
             pass
         else:
             self.do_last_failed = False
         return is_ok
+
+    def set_recommended_division_for_steps(self, time_step, actual_absolute_value, threshold_absolute_value) -> None:
+        reccommended_division = int(np.ceil(actual_absolute_value / threshold_absolute_value))
+        max_division = int(np.ceil(time_step/self.config.min_time_step))
+        self.recommended_division_for_steps =max(min(reccommended_division, max_division), 2)
+
 
     def get_threshold_by_absolute(self) -> float:
         """Returns the absolute threshold value."""
@@ -138,10 +147,9 @@ class AdaptabilityManager:
         else: 
             self.last_threshold_absolute_value = worst_threshold_value
             is_ok = self.check_adaptive_ok_by_threshold(worst_threshold_value, time_step)
-        
+
         if time_step < self.config.min_time_step:
-            ic("min time step reached", self.last_threshold_absolute_value, self.get_value(time_step))
-            #ic(self.last_threshold_absolute_value, self.do_last_failed, np.array([self._value_history[0], self._value_history[-1]]), self.get_value(time_step))
+            #ic("min time step reached", self.last_threshold_absolute_value, self.get_value(time_step))
             return True
         return is_ok
 

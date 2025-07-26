@@ -70,6 +70,11 @@ class ParticleSpace(list):
         return tuple(p.position_history for p in self)
 
     @property
+    def recommended_division_for_steps(self) -> int:
+        return_value = int(max(particle.adaptaptability.recommended_division_for_steps for particle in self))
+        return return_value
+    
+    @property
     def life_time(self) -> float:
         """Read-only access to the life the particle have lived."""
         return self._life_time
@@ -124,7 +129,7 @@ class ParticleSpace(list):
     def get_particle_property_array(self, property_name: str) -> tuple[np.ndarray, ...]:
         """Return a tuple of arrays for the given property of each particle in the space."""
         return tuple(getattr(particle, property_name) for particle in self)
-
+    
     def get_particle_property_list(self, property_name: str) -> list[Any]:
         """Return a list of arrays for the given property of each particle in the space."""
         return [getattr(particle, property_name) for particle in self]
@@ -178,14 +183,38 @@ class ParticleSpace(list):
             self.advance_particles_time_step(time_step)
         else:
             self.is_being_adaptive = True
+            time_steps_division:int = 2#self.recommended_division_for_steps
+            lower_time_step = time_step/time_steps_division
+            assert not time_steps_division ==1 # Because if not, it could cause a loop (recursion error)
+            self.adapatative_recursive_iteration(lower_time_step)
+            for _ in range(time_steps_division-1):
+                self.apply_all_forces_array() # from one advance_particles_time_step to the other
+                self.adapatative_recursive_iteration(lower_time_step)
+
+            """self.is_being_adaptive = True
             lower_time_step = time_step/2
             
             self.adapatative_recursive_iteration(lower_time_step)
             self.apply_all_forces_array() # from one advance_particles_time_step to the other
+            self.adapatative_recursive_iteration(lower_time_step)"""
+
+    """def adapatative_recursive_iteration(self, time_step: float) -> None:
+        if self.check_adaptive_ok(time_step):
+            self.advance_particles_time_step(time_step)
+        elif self.recommended_division_for_steps == 1:
+            self.adapatative_iterate_time_step(time_step)
+        else:
+            self.is_being_adaptive = True
+            time_steps_division:int = self.recommended_division_for_steps
+            lower_time_step = time_step/time_steps_division
+            assert not time_steps_division ==1
             self.adapatative_recursive_iteration(lower_time_step)
+            for _ in range(time_steps_division-1):
+                self.apply_all_forces_array() # from one advance_particles_time_step to the other
+                self.adapatative_recursive_iteration(lower_time_step)"""
 
     def adapatative_iterate_time_step(self, time_step: float) -> None:
-        self.apply_all_forces_array()
+        self.apply_all_forces_array() # move into self.adapatative_recursive_iteration
         self.adapatative_recursive_iteration(time_step)
         self._life_time += time_step
         self.is_being_adaptive = False

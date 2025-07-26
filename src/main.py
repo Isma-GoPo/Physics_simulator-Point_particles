@@ -22,17 +22,21 @@ ic(CONFIGURATION)
 CONFIGURATION.update(USER_SETTING_DICT)
 #ic(CONFIGURATION)
 
-ic.disable()
+#ic.disable()
 
 
 def main():
-    #space = utils.init_space.circular_motion_decelerating_particle()
-    #space, custom_settings  = utils.init_space.orbiting_decelerating_particles()
-    #space, custom_settings  = utils.init_space.two_particles_from_repose()
-    space, custom_settings = utils.init_space.solar_system()
+    #init_space = utils.init_space.orbiting_decelerating_particles
+    #init_space = utils.init_space.circular_motion_decelerating_particle
+    init_space = utils.init_space.two_particles_from_repose
+
+    space, custom_settings  = init_space()
+
     CONFIGURATION.update(custom_settings)
     
     new_sim_settings = {
+        #"simulation_time": 384852,
+        #"time_step": 10.,
         "adaptability": {
             "is_adaptive": True,
             "max_absolute_value": np.inf,
