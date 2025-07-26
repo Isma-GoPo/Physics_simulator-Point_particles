@@ -25,6 +25,9 @@ class ConfigAdapt(NestedHash):
     def max_absolute_value(self) -> float:
         return self.max_velocity_diff #should generally have this name, but because it is for velocity, it is more clear as it
 
+    @max_absolute_value.setter
+    def max_absolute_value(self, value: float) -> None:
+        self.max_velocity_diff = value
 
 class ConfigSimulation(NestedHash):
     def __init__(self) -> None:

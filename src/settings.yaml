@@ -5,9 +5,9 @@ simulation:
   min_relative_time_step_reduction: 1e2 # from adaptative but needs time step
   adaptability:
     is_adaptative: True
-    max_quantile: 1.
+    max_quantile: 1.1
     quantile_ignored_extremes: 5
-    #max_velocity_diff: 1e-4 # meassure the adapatative accuracy
+    #max_absolute_value: 1e-4 # meassure the adapatative accuracy
     #max_deviation: #900
 plotting: 
   plotting_time: 10.
