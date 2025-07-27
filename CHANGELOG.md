@@ -1,14 +1,17 @@
 This is the log file. Its purpose is to have an idea of what I have done when I enter the project a long time later.
 
 
-## v0.7.2 [2025-07-XX]
-...
-- In adaptManager if setp< min try to check and if it fails is when `min_time_step_failed` should works instead of `do_last_time_failed`
-- Make that store_value in adaptability manager works when is not adaptative
+## v0.7.2 [2025-07-27]
+Quality of life improvements:
+- Solved bugs
+  - Make `AdaptablityManager > store_value` work as intended (before in adaptability manager works when is not adaptative)
+- Now AdaptablityManager > `_last_threshold_absolute_value` only returns if the last time step failed.
 
-From branch:
-- deleted max force -> adaptability `last_threshold_absolute_value` is better
-- git commit -am "privatised the functions and atributes (with '_') that are intented to be only used inside the class and/or have side effects that may be not intended outside the class"
+###### Features Cleanup
+- Privatised the functions and atributes (with '_') that are intented to be only used inside the class and/or have side effects that may be not intended when used outside the class
+- Deleted exceeded functionalities (not longer to use because other is better):
+  - deleted `max_force` limitation for being exceded by `AdaptabilityManager > last_threshold_absolute_value`
+  - deleted log_history from Adaptability manager and its threshold `relative_log_diff` for being exceded by `max_quantile > 1`
 
 ## v0.7.1 [2025-07-27]
 Quality of life improvements:
