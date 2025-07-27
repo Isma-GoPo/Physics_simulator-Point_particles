@@ -2,10 +2,10 @@ simulation:
   #simulation_time:   # in secs
   #time_step: 10.
   #max_allowed_force: 10.
-  min_relative_time_step_reduction: 3e1 # from adaptative but needs time step
+  min_relative_time_step_reduction: 1e1 # from adaptative but needs time step
   adaptability:
     is_adaptative: True
-    max_quantile: 1.1 #2.
+    max_quantile: 1.5 #2.
       # As lower is the value, more steps to process
     quantile_ignored_extremes: 20
       # increase it if particles get toguether frequently

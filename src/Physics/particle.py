@@ -7,8 +7,11 @@ from typing import Any, Callable, TypeVar, ParamSpec
 P = ParamSpec('P')  # For type hinting *args, **kwargs
 InstanceType = TypeVar('InstanceType') # When decorating a method *within* AdaptabilityManager, InstanceType will be AdaptabilityManager
 
+
+
 # My modules
 from physics.adaptability_manager import AdaptabilityManager
+from utils.functions_utils import run_if_condition
 
 # relative imports
 import os, sys
@@ -140,21 +143,6 @@ class Particle:
         #else:
         #    raise Exception("Tried to set acceleration_from_threshold when the last step of the particle was adaptative-ok")
         #ic(self.acceleration)
-    
-    # decorator
-    @staticmethod
-    def run_if_condition(condition: Callable[..., bool]) -> Callable[..., Callable[..., Any | None]]:
-        """Returns a decorator that runs it wrapped function if the condition is met"""
-        def run_if_condition_decorator(adaptative_dependant_function: Callable[..., Any]) -> Callable[..., Any | None]:
-            """Diseable the taged function if the particle is in an adaptive state."""
-            @wraps(adaptative_dependant_function)
-            def wrapper_function(self, *args, **kwargs) -> Any | None:
-                if condition(self):
-                    return adaptative_dependant_function(self, *args, **kwargs)
-                #else:
-                    #ic(condition, condition(self))
-            return wrapper_function
-        return run_if_condition_decorator
 
     # --- OPERATING METHODS ---
 
