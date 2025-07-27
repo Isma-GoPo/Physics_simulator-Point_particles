@@ -88,6 +88,10 @@ class NestedHash():
     # --- Custom methods ---
 
     def get(self, key: str, *nested_keys: str) -> Any:
+        """
+        Get an atribute allowing to access nested keys by comma separeated atributes.
+        
+        Example: config.get("user1", "ip") == config["user1"]["ip"]"""
         try:
             if len(nested_keys) == 0:
                 return getattr(self, key)

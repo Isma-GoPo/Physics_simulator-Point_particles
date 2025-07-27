@@ -47,7 +47,6 @@ class AdaptabilityManager:
         self.get_value: Callable[[float], float] = get_value_function # when called (no arguments) returns a value for storing it in history
             # very prouf of using a function in this way for not having to access the Particle object
         self._value_history: np.ndarray = np.empty((0), float)
-        self._value_log_history: np.ndarray = np.empty((0), float)
         
         self._last_threshold_absolute_value: float = -1. # Only used when `do_last_failed` is false
         self.do_last_failed: bool = False
@@ -65,7 +64,6 @@ class AdaptabilityManager:
         """Store the defined value from `get_value` function in the history, for a given time_step."""
         if self.config.is_adaptive:
             self._value_history = np.append(self._value_history, self.get_value(time_step))
-            #self._value_log_history = np.append(self._value_log_history, np.log(self.get_value(time_step))) 
     
     # --- CHECK adaptive METHODS ---
     def is_adaptive_ok_by_threshold(self, threshold_absolute_value: float, time_step: float) -> bool:
@@ -119,16 +117,6 @@ class AdaptabilityManager:
     def get_threshold_by_deviation(self) -> float:
         """Returns the deviation-based threshold value."""
         return float(np.mean(self._value_history) + self.config.max_deviation * np.std(self._value_history))
-    
-    @deprecated("Better to use `max_quantile`>1. instead")
-    def get_threshold_by_relative_log_diff(self) -> float:
-        """DEPRECATED Returns the relative log difference-based threshold value."""
-        IGNORED_EXTREMES = 0.1 # in %
-        log_diff = np.percentile(self._value_log_history, 100-IGNORED_EXTREMES, method="higher") \
-            - np.percentile(self._value_log_history, IGNORED_EXTREMES, method="lower")
-        log_mean = np.mean(self._value_log_history[:-2])
-        log_value = log_mean + log_diff * (self.config.max_relative_log_diff-0.5) # because mean is ~quantile 0.5
-        return float(np.exp(log_value))
 
     def get_worst_threshold_value(self) -> float:
         """Returns the worst threshold value. -1 if there is no calculation possible for the threshold, so it is ckecked coorrectly"""
