@@ -26,9 +26,9 @@ CONFIGURATION.update(USER_SETTING_DICT)
 
 
 def main():
-    #init_space = utils.init_space.orbiting_decelerating_particles
+    init_space = utils.init_space.orbiting_decelerating_particles
     #init_space = utils.init_space.solar_system
-    init_space = utils.init_space.two_particles_from_repose
+    #init_space = utils.init_space.two_particles_from_repose
 
     space, custom_settings  = init_space()
 
@@ -57,6 +57,7 @@ def main():
     print(CONFIGURATION)
     print_animated_simulation_by_space(space) 
 
+    print(len(space[0].adaptability._value_history))
     #ic(space.position_history_array)
     #ic(space[0].adaptability._value_history)
     

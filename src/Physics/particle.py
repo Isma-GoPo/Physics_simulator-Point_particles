@@ -43,8 +43,7 @@ class Particle:
         self.position = initial_position if initial_position is not None else np.zeros(3)
         self.velocity = initial_velocity if initial_velocity is not None else np.zeros(3)
         self.acceleration_field = acceleration_field if acceleration_field is not None else np.zeros(3)
-        initial_acceleration = initial_acceleration if initial_acceleration is not None else np.zeros(3)
-        self.acceleration = initial_acceleration + self.acceleration_field # Add the acceleration field to the initial acceleration
+        self.reset_acceleration() # Add the acceleration field to the initial acceleration
         
         self._last_velocity = np.zeros(3)
         self._last_acceleration = np.zeros(3)
@@ -52,6 +51,7 @@ class Particle:
         self._velocity_diff_history = np.empty((0), float) # For adaptive
         self._life_time = 0.0
         self._is_being_adaptive: bool = False
+        self._is_first_substep: bool = True
 
         self.adaptability = AdaptabilityManager(self.velocity_differential)
 
@@ -109,6 +109,7 @@ class Particle:
                 # - store_position_in_history
             else:
                 self.store_position_in_history()
+                self._is_first_substep = True
     
     # --- METHODS ---        
     
@@ -142,13 +143,18 @@ class Particle:
     
     # decorator
     @staticmethod
-    def run_if_not_being_adaptative(adaptative_dependant_function: Callable[..., Any]) -> Callable[..., Any | None]:
-        """Diseable the taged function if the particle is in an adaptive state."""
-        @wraps(adaptative_dependant_function)
-        def wrapper_function(self, *args, **kwargs) -> Any | None:
-            if not self.is_being_adaptive:
-                return adaptative_dependant_function(self, *args, **kwargs)
-        return wrapper_function
+    def run_if_condition(condition: Callable[..., bool]) -> Callable[..., Callable[..., Any | None]]:
+        """Returns a decorator that runs it wrapped function if the condition is met"""
+        def run_if_condition_decorator(adaptative_dependant_function: Callable[..., Any]) -> Callable[..., Any | None]:
+            """Diseable the taged function if the particle is in an adaptive state."""
+            @wraps(adaptative_dependant_function)
+            def wrapper_function(self, *args, **kwargs) -> Any | None:
+                if condition(self):
+                    return adaptative_dependant_function(self, *args, **kwargs)
+                #else:
+                    #ic(condition, condition(self))
+            return wrapper_function
+        return run_if_condition_decorator
 
     # --- OPERATING METHODS ---
 
@@ -198,24 +204,31 @@ class Particle:
         """
         self.acceleration += applied_acceleration
 
-    @run_if_not_being_adaptative
+    @run_if_condition(lambda self: not self._is_being_adaptive) # Only run if is not being adaptive
     def store_position_in_history(self) -> None:
         """Stores the current position in the position history."""
         self._position_history = np.vstack((self.position_history, [self.position]))
 
-    @run_if_not_being_adaptative
-    def store_velocity_diff_in_history(self, time_step: float) -> None:
+    @run_if_condition(lambda self: self._is_first_substep) # Only run if is not being adaptive
+    def store_adaptability_value_in_history(self, time_step: float) -> None:
         """Stores the velocity difference in the adaptability propierty history."""
         self.adaptability.store_value_in_history(time_step)
 
+    def reset_acceleration(self) -> None:
+        """Reset the acceleration, making it equal to the acceleration field."""
+        self.acceleration = self.acceleration_field.copy()
+
+    def shift_cinematic_properties(self) -> None:
+        """Shift velocity, accelearation properties to `last` and reset acceleration."""
+        self._last_velocity = self.velocity.copy() # .copy() because ndarray is mutable
+        # velocity is preserved (conservation of momentum)
+        self._last_acceleration = self.acceleration.copy() # .copy() because ndarray is mutable
+        self.reset_acceleration()
 
     def store_current_state(self) -> None:
         """Stores the current position in history and velocity and acceleration as the last ones and reset them."""
         self.store_position_in_history()
-        self._last_velocity = self.velocity.copy() # .copy() because ndarray is mutable
-        # velocity is preserved (conservation of momentum)
-        self._last_acceleration = self.acceleration.copy() # .copy() because ndarray is mutable
-        self.acceleration = self.acceleration_field.copy()  # Reset acceleration to the field value
+        self.shift_cinematic_properties()
 
     def advance_time_step(self, time_step: float = 1.0) -> None:
         """Advances the particle's state by one time step, accelerating and translating it.
@@ -223,10 +236,16 @@ class Particle:
         Keyword arguments:
         time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
         """
-        self.store_velocity_diff_in_history(time_step)
+        #ic(self._is_first_substep)
+        self.store_adaptability_value_in_history(time_step)
         if time_step < self.adaptability.config.min_time_step:
             self._set_acceleration_from_threshold_value(time_step)
         self.do_accelerate(time_step)
         self.do_translate(time_step)
         self.store_current_state()
         self._life_time += time_step
+        
+        # last thing to do in step
+        if self._is_being_adaptive and self._is_first_substep == True:
+            self._is_first_substep = False
+

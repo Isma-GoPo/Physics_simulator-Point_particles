@@ -115,6 +115,12 @@ def orbiting_decelerating_particles(initial_position: np.ndarray | None = None) 
         "simulation": {
             "simulation_time": 40,
             "time_step": 0.01,
+            #"min_relative_time_step_reduction": 3e1,
+            #"adaptability": {
+            #    "is_adaptive": True,
+            #    "max_quantile": 1.1,
+            #    "quantile_ignored_extremes": 20,
+            #},
         },
         "plotting": {
             "plotting_time": 10,
