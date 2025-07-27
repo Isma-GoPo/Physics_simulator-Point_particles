@@ -56,7 +56,7 @@ class Particle:
         self._is_being_adaptive: bool = False
         self._is_first_substep: bool = True
 
-        self.adaptability = AdaptabilityManager(self.velocity_differential)
+        self.adaptability = AdaptabilityManager(self._velocity_differential)
 
     # --- PROPERTIES ---
 
@@ -101,18 +101,19 @@ class Particle:
     
     @is_being_adaptive.setter
     def is_being_adaptive(self, state: bool) -> None:
-        """Set the state (adapatative) of the particle. Forcing to store the values it couldn't when it was being adaptative."""
+        """Set the state (adapatative) of the particle. 
+        Forcing to store the values it couldn't when it was being adaptative."""
         state = bool(state)
         if state != self._is_being_adaptive:    # Only works if it alternate it state
             self._is_being_adaptive = state
             
-            if state == True:
-                pass
-                # This means that some functions works different:
-                # - store_position_in_history
+            if state == False:
+                if self._is_first_substep == False: 
+                # This means as least one step have run from when it was setted adaptative
+                    self._store_position_in_history()
+                    self._is_first_substep = True
             else:
-                self.store_position_in_history()
-                self._is_first_substep = True
+                pass
     
     # --- METHODS ---        
     
@@ -129,7 +130,7 @@ class Particle:
     
     # --- adaptive METHODS ---
     
-    def velocity_differential(self, time_step: float = 1.0) -> float:
+    def _velocity_differential(self, time_step: float = 1.0) -> float:
         """Returns the velocity differential caused by the acceleration and the time step size.
         It is used as meassure for adaptability"""
         value = float( np.linalg.norm(self.acceleration_to_apply) * time_step )
@@ -146,35 +147,17 @@ class Particle:
 
     # --- OPERATING METHODS ---
 
-    def do_translate(self, time_step: float = 1.0, forced_velocity: np.ndarray | None = None) -> None:
-        """Translate (move) the position of the particle according to the velocity (inner or given) during the given time step.
-
-        Keyword arguments:
-        time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
-        forced_velocity: [m/s] a 3D numpy array for velocity in x, y, z
-          If no velocity is given, it takes the velocity of the object
+    def _do_translate(self, time_step: float = 1.0) -> None:
+        """Translate (move) the position of the particle according to the particle velocity during the given time step.
         """
-        if forced_velocity is None:
-            velocity = self.velocity_to_apply
-        else:
-            velocity = forced_velocity
-        
-        self.position += velocity * time_step
+        # A `force_translate` function could be added to pass the velocity as an argument
+        self.position += self.velocity_to_apply * time_step
 
-    def do_accelerate(self, time_step: float = 1.0, forced_acceleration: np.ndarray | None = None) -> None:
-        """Updates the velocity of the particle according to the acceleration (inner or given) during the given time step.
-
-        Keyword arguments:
-        time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
-        forced_acceleration: [m/s2] a 3D numpy array for acceleration in x, y, z
-          If no acceleration is given, it takes the acceleration of the object
+    def _do_accelerate(self, time_step: float = 1.0) -> None:
+        """Updates the velocity of the particle according to the particle acceleration during the given time step.
         """
-        if forced_acceleration is None:
-            acceleration = self.acceleration_to_apply
-        else:
-            acceleration = forced_acceleration
-        
-        self.velocity += acceleration * time_step
+        # A `force_accelerate` function could be added to pass the velocity as an argument
+        self.velocity += self.acceleration_to_apply * time_step
 
     def apply_force(self, applied_force: np.ndarray) -> None:
         """Applies a force to the particle, updating its acceleration.
@@ -193,12 +176,12 @@ class Particle:
         self.acceleration += applied_acceleration
 
     @run_if_condition(lambda self: not self._is_being_adaptive) # Only run if is not being adaptive
-    def store_position_in_history(self) -> None:
+    def _store_position_in_history(self) -> None:
         """Stores the current position in the position history."""
         self._position_history = np.vstack((self.position_history, [self.position]))
 
     @run_if_condition(lambda self: self._is_first_substep) # Only run if is not being adaptive
-    def store_adaptability_value_in_history(self, time_step: float) -> None:
+    def _store_adaptability_value_in_history(self, time_step: float) -> None:
         """Stores the velocity difference in the adaptability propierty history."""
         self.adaptability.store_value_in_history(time_step)
 
@@ -206,7 +189,7 @@ class Particle:
         """Reset the acceleration, making it equal to the acceleration field."""
         self.acceleration = self.acceleration_field.copy()
 
-    def shift_cinematic_properties(self) -> None:
+    def _shift_cinematic_properties(self) -> None:
         """Shift velocity, accelearation properties to `last` and reset acceleration."""
         self._last_velocity = self.velocity.copy() # .copy() because ndarray is mutable
         # velocity is preserved (conservation of momentum)
@@ -215,8 +198,8 @@ class Particle:
 
     def store_current_state(self) -> None:
         """Stores the current position in history and velocity and acceleration as the last ones and reset them."""
-        self.store_position_in_history()
-        self.shift_cinematic_properties()
+        self._store_position_in_history()
+        self._shift_cinematic_properties()
 
     def advance_time_step(self, time_step: float = 1.0) -> None:
         """Advances the particle's state by one time step, accelerating and translating it.
@@ -225,11 +208,11 @@ class Particle:
         time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
         """
         #ic(self._is_first_substep)
-        self.store_adaptability_value_in_history(time_step)
+        self._store_adaptability_value_in_history(time_step)
         if time_step < self.adaptability.config.min_time_step:
             self._set_acceleration_from_threshold_value(time_step)
-        self.do_accelerate(time_step)
-        self.do_translate(time_step)
+        self._do_accelerate(time_step)
+        self._do_translate(time_step)
         self.store_current_state()
         self._life_time += time_step
         

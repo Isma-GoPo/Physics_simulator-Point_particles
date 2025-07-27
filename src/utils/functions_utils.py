@@ -14,7 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from settings import CONFIGURATION
 
 # Decorators
-def limit_force_module(force_func: Callable[P, np.ndarray], max_force_module: float | np.ndarray = CONFIGURATION.simulation.max_allowed_force) -> Callable[P, np.ndarray]: # type: ignore
+def limit_force_module(force_func: Callable[P, np.ndarray], max_force_module: float) -> Callable[P, np.ndarray]: # type: ignore
     @wraps(force_func) # Copy attributes (e.g. `__doc__`) from the wrapped function (debbuging)
     def wrapper_function(*args, **kwargs):
         return_force = force_func(*args, **kwargs)

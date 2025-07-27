@@ -6,6 +6,10 @@ This is the log file. Its purpose is to have an idea of what I have done when I 
 - In adaptManager if setp< min try to check and if it fails is when `min_time_step_failed` should works instead of `do_last_time_failed`
 - Make that store_value in adaptability manager works when is not adaptative
 
+From branch:
+- deleted max force -> adaptability `last_threshold_absolute_value` is better
+- git commit -am "privatised the functions and atributes (with '_') that are intented to be only used inside the class and/or have side effects that may be not intended outside the class"
+
 ## v0.7.1 [2025-07-27]
 Quality of life improvements:
 - Solved bugs

@@ -140,14 +140,13 @@ class ParticleSpace(list):
         """Return a tuple of reduced position history (`steps_relation` times smaller) arrays for each particle in the space."""
         return tuple(particle.position_history[::steps_relation] for particle in self)
     
-    def check_adaptive_ok(self, time_step: float) -> bool:
+    def _check_adaptive_ok(self, time_step: float) -> bool:
         """Return wheter if the given time step is okay (adaptatibely correct) forall the particles in the space.
         -> Go to AdaptabilityManager.check_adaptive_ok documentation
 
         Returns:
         True if the step size is okay, False if it should be shorter
         """
-        
         #assert np.linalg.norm(self[0].acceleration) != 0
         return all(particle.adaptability.check_adaptive_ok(time_step) for particle in self)
 
@@ -155,18 +154,18 @@ class ParticleSpace(list):
 
     # --- OPERATING METHODS ---
 
-    def advance_particles_time_step(self, time_step: float= 1.) -> None:
+    def _advance_particles_time_step(self, time_step: float= 1.) -> None:
         """Advance all particles in the space by a given time step."""
         for particle in self:
             particle.advance_time_step(time_step)
 
-    def apply_single_forces_array(self) -> None:
+    def _apply_single_forces_array(self) -> None:
         """Apply the forces (in self) to each particle in the space individually."""
         for particle in self:
             for force in self._single_forces_array:
                 particle.apply_force(force(particle))
     
-    def apply_couple_forces_array(self) -> None:
+    def _apply_couple_forces_array(self) -> None:
         """Apply the forces (in self) to each pair of particles in the space."""
         for i, particle1 in enumerate(self):
             for particle2 in self[i+1:]:
@@ -175,10 +174,10 @@ class ParticleSpace(list):
                     particle1.apply_force(force_to_apply)
                     particle2.apply_force(-force_to_apply)
 
-    def apply_all_forces_array(self) -> None:
+    def _apply_all_forces_array(self) -> None:
         """Group the application of all the forces"""
-        self.apply_single_forces_array()
-        self.apply_couple_forces_array()
+        self._apply_single_forces_array()
+        self._apply_couple_forces_array()
 
     def _adapatative_recursive_iteration(self, time_step: float) -> None:
         """Check if the time step is okay. Advance step if okay, or recursevilly reduce the time step if not.
@@ -186,8 +185,8 @@ class ParticleSpace(list):
         # I cannot use `self.apply_all_forces_array` here because if it recursevilly rerun, it would apply it twice before advancing step
         
         assert np.linalg.norm(self[0].acceleration) != 0   # If not applied acceleration before
-        if self.check_adaptive_ok(time_step):
-            self.advance_particles_time_step(time_step)
+        if self._check_adaptive_ok(time_step):
+            self._advance_particles_time_step(time_step)
         else:
             self.is_being_adaptive = True
             time_steps_division:int = self.recommended_division_for_steps
@@ -195,13 +194,13 @@ class ParticleSpace(list):
             assert not time_steps_division ==1 # Because if not, it could cause a loop (recursion error)
             self._adapatative_recursive_iteration(lower_time_step)
             for _ in range(time_steps_division-1):
-                self.apply_all_forces_array()
+                self._apply_all_forces_array()
                 self._adapatative_recursive_iteration(lower_time_step)
 
-    def adapatative_iterate_time_step(self, time_step: float) -> None:
+    def iterate_adapatative_time_step(self, time_step: float) -> None:
         """Advance all particles in the space applying the forces adapting the given step into an scale that fulfil the "adaptability check".
         """
-        self.apply_all_forces_array()
+        self._apply_all_forces_array()
         self._adapatative_recursive_iteration(time_step)
         self._life_time += time_step
         self.is_being_adaptive = False
@@ -209,8 +208,8 @@ class ParticleSpace(list):
     def iterate_time_step(self, time_step: float = 1.) -> None:
         """Advance all particles in the space applying the forces for the given step. No adaptability.
         """
-        self.apply_all_forces_array()
-        self.advance_particles_time_step(time_step)
+        self._apply_all_forces_array()
+        self._advance_particles_time_step(time_step)
         self._life_time += time_step
 
     @print_run_time
@@ -230,4 +229,4 @@ class ParticleSpace(list):
                 self.iterate_time_step(self.config.time_step)
         else: 
             for _ in range(self.config.number_of_time_steps):
-                self.adapatative_iterate_time_step(self.config.time_step)
+                self.iterate_adapatative_time_step(self.config.time_step)

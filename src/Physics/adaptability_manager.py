@@ -78,17 +78,17 @@ class AdaptabilityManager:
             is_ok = actual_absolute_value < threshold_absolute_value
         return is_ok
     
-    def set_last_checked_fail(self, threshold_absolute_value: float, time_step: float) -> None:
+    def _set_last_checked_fail(self, threshold_absolute_value: float, time_step: float) -> None:
         actual_absolute_value = self.get_value(time_step)
         self.do_last_failed = True
         self._last_threshold_absolute_value = threshold_absolute_value
-        self.set_recommended_division_for_steps(time_step, actual_absolute_value, threshold_absolute_value)
+        self._set_recommended_division_for_steps(time_step, actual_absolute_value, threshold_absolute_value)
 
-    def set_last_checked_okay(self) -> None:
+    def _set_last_checked_okay(self) -> None:
         self.do_last_failed = False
 
     
-    def set_recommended_division_for_steps(self, time_step, actual_absolute_value, threshold_absolute_value) -> None:
+    def _set_recommended_division_for_steps(self, time_step, actual_absolute_value, threshold_absolute_value) -> None:
         reccommended_division = int(np.ceil(actual_absolute_value / threshold_absolute_value))
         max_division = int(np.ceil(time_step/self.config.min_time_step))
         self.recommended_division_for_steps =max(min(reccommended_division, max_division), 2)
@@ -168,9 +168,9 @@ class AdaptabilityManager:
         is_ok = self.is_adaptive_ok_by_threshold(worst_threshold_value, time_step)
         
         if not is_ok:
-            self.set_last_checked_fail(worst_threshold_value, time_step)
+            self._set_last_checked_fail(worst_threshold_value, time_step)
         else:
-            self.set_last_checked_okay()
+            self._set_last_checked_okay()
 
         if time_step < self.config.min_time_step:
             ic("min time step reached", self._last_threshold_absolute_value, self.get_value(time_step))
