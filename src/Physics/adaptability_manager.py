@@ -99,10 +99,11 @@ class AdaptabilityManager:
         return float(self.config.max_absolute_value)
 
     def _get_value_by_extrapolated_quantile(self, extrapolated_quantile: float) -> float:
-        IGNORED_EXTREMES = self.config.quantile_ignored_extremes
+        IGNORED_EXTREMES = self.config.quantile_ignored_extremes # In %
             # 2-1 it sweet spot (2 to 0.5)
         relative_diff = np.percentile(self._value_history, 100-IGNORED_EXTREMES, method="higher") \
             / np.percentile(self._value_history, IGNORED_EXTREMES, method="lower")
+        relative_diff /= 1 - (2*IGNORED_EXTREMES/100)
         value_mean = np.mean(self._value_history[:-2])
         value = value_mean * relative_diff * (self.config.max_quantile-0.5) # because mean is ~quantile 0.5
         return float(value)
