@@ -37,9 +37,10 @@ def main():
     new_sim_settings = {
         #"simulation_time": 384852,
         #"time_step": 100.,
+        "min_relative_time_step_reduction": 1e1,
         "adaptability": {
-            "is_adaptive": True,
-            "max_absolute_value": np.inf,
+        #    "is_adaptive": True,
+        #    "max_absolute_value": np.inf,
         },
     }
 

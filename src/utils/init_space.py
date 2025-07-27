@@ -63,7 +63,7 @@ def two_particles_from_repose(initial_position: np.ndarray | None = None) -> tup
         "simulation": {
             "simulation_time": 96213*2, #1.05,
             "time_step": 10.,
-            "min_relative_time_step_reduction": 1e3,
+            "min_relative_time_step_reduction": 1e2,
             "adaptability": {
                 "is_adaptive": True,
                 "max_quantile": 4.,

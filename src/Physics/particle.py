@@ -131,11 +131,13 @@ class Particle:
         value = float( np.linalg.norm(self.acceleration_to_apply) * time_step )
         return value
     
-    def set_acceleration_from_velocity_differential(self, time_step: float = 1.0) -> None:
+    def _set_acceleration_from_threshold_value(self, time_step) -> None:
         """Try to make the oposite of `velocity_differential`, returning an acceleration using the velocity_differential of the `AdaptabilityManager`"""
         if self.adaptability.do_last_failed:
             max_acceleration = self.adaptability.last_threshold_absolute_value / time_step
             self.acceleration = self.acceleration/np.linalg.norm(self.acceleration) * max_acceleration
+        #else:
+        #    raise Exception("Tried to set acceleration_from_threshold when the last step of the particle was adaptative-ok")
         #ic(self.acceleration)
     
     # decorator
@@ -222,8 +224,8 @@ class Particle:
         time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
         """
         self.store_velocity_diff_in_history(time_step)
-        if time_step/2 < self.adaptability.config.min_time_step:
-            self.set_acceleration_from_velocity_differential(time_step)
+        if time_step < self.adaptability.config.min_time_step:
+            self._set_acceleration_from_threshold_value(time_step)
         self.do_accelerate(time_step)
         self.do_translate(time_step)
         self.store_current_state()

@@ -7,7 +7,7 @@ from icecream import ic
 
 
 # My modules
-from physics.particle import Particle
+from physics.particle import Particle, AdaptabilityManager
 # Relative imports
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -142,11 +142,15 @@ class ParticleSpace(list):
     
     def check_adaptive_ok(self, time_step: float) -> bool:
         """Return wheter if the given time step is okay (adaptatibely correct) forall the particles in the space.
+        -> Go to AdaptabilityManager.check_adaptive_ok documentation
 
         Returns:
         True if the step size is okay, False if it should be shorter
         """
+        
+        #assert np.linalg.norm(self[0].acceleration) != 0
         return all(particle.adaptability.check_adaptive_ok(time_step) for particle in self)
+
 
 
     # --- OPERATING METHODS ---
@@ -181,6 +185,7 @@ class ParticleSpace(list):
         """
         # I cannot use `self.apply_all_forces_array` here because if it recursevilly rerun, it would apply it twice before advancing step
         
+        assert np.linalg.norm(self[0].acceleration) != 0   # If not applied acceleration before
         if self.check_adaptive_ok(time_step):
             self.advance_particles_time_step(time_step)
         else:
@@ -190,8 +195,8 @@ class ParticleSpace(list):
             assert not time_steps_division ==1 # Because if not, it could cause a loop (recursion error)
             self._adapatative_recursive_iteration(lower_time_step)
             for _ in range(time_steps_division-1):
-                self._adapatative_recursive_iteration(lower_time_step)
                 self.apply_all_forces_array()
+                self._adapatative_recursive_iteration(lower_time_step)
 
     def adapatative_iterate_time_step(self, time_step: float) -> None:
         """Advance all particles in the space applying the forces adapting the given step into an scale that fulfil the "adaptability check".

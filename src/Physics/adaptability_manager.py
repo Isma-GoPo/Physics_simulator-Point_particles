@@ -22,6 +22,14 @@ from settings import CONFIGURATION
 
 
 class AdaptabilityManager:
+    """
+    AdaptabilityManager is a class that manages the adaptability of time steps: Whether or not they should run and how much the should decrease.
+
+
+    Class workings:
+        - `check` methods returns True or False along doing some changes in property accordanly
+        - `get` for only getting return value and not making changes
+    """
     def __init__(self, 
                  get_value_function: Callable[[float], float],
                  adaptativility_config: ConfigAdapt = CONFIGURATION.simulation.adaptability,
@@ -31,11 +39,8 @@ class AdaptabilityManager:
         Possitional-Keyword arguments:
         - get_value_function: a function that when called return an absolute (positive) value which decrease proportionally with time_step
           It return the value that `AdaptabilityManager` study 
-        - adaptive_config: Config instance that defines:
-          - max_absolute_value: the max velocity different that will be allowed to occur in a time step (default None -> it isn't checked)
-          - max_quantile: the quantile in the velocity_diff_history that will be detected as non-ok if adaptive_deviation is high enough (default None -> it isn't checked)
-          - max_deviation: the standard deviation in the velocity_diff against velocity_diff_history that will be detected as non-ok if adaptive_quantile is high enough
-        - 
+        - adaptive_config: Optional config instance that defines the adaptability parameters
+
         """            
         self.config: ConfigAdapt = adaptativility_config
         
@@ -44,9 +49,17 @@ class AdaptabilityManager:
         self._value_history: np.ndarray = np.empty((0), float)
         self._value_log_history: np.ndarray = np.empty((0), float)
         
-        self.threshold_absolute_value: float = 0.
-        self.do_last_failed:bool = False
+        self._last_threshold_absolute_value: float = -1. # Only used when `do_last_failed` is false
+        self.do_last_failed: bool = False
         self.recommended_division_for_steps:int = 2
+
+    @property
+    def last_threshold_absolute_value(self) -> float:
+        if self.do_last_failed:
+            return self._last_threshold_absolute_value
+        else:
+            raise AttributeError("You are not allowed to use last_threshold_absolute_value when the last check was ok")
+
 
     def store_value_in_history(self, time_step: float) -> None:
         """Store the defined value from `get_value` function in the history, for a given time_step."""
@@ -55,22 +68,26 @@ class AdaptabilityManager:
             #self._value_log_history = np.append(self._value_log_history, np.log(self.get_value(time_step))) 
     
     # --- CHECK adaptive METHODS ---
-    def check_adaptive_ok_by_threshold(self, threshold_absolute_value: float, time_step: float) -> bool:
-        """Return wheteher the given threshold value makes the real value adaptative-ok (-1. means is ok)
-        And save the values"""
-        actual_absolute_value = self.get_value(time_step)
-        #ic(threshold_absolute_value, actual_absolute_value)
-        is_ok: bool = actual_absolute_value < threshold_absolute_value
-        if not is_ok:
-            self.do_last_failed = True
-            self.last_threshold_absolute_value = threshold_absolute_value
-            self.set_recommended_division_for_steps(time_step, actual_absolute_value, threshold_absolute_value)
-            pass
+    def is_adaptive_ok_by_threshold(self, threshold_absolute_value: float, time_step: float) -> bool:
+        """Return wheteher the given threshold value makes the real value adaptative-ok (-1. means is ok)"""
+        if threshold_absolute_value == -1:
+            is_ok = True
         else:
-            self.do_last_failed = False
-        
+            assert self.get_value(1.) != 0
+            actual_absolute_value = self.get_value(time_step)
+            is_ok = actual_absolute_value < threshold_absolute_value
         return is_ok
+    
+    def set_last_checked_fail(self, threshold_absolute_value: float, time_step: float) -> None:
+        actual_absolute_value = self.get_value(time_step)
+        self.do_last_failed = True
+        self._last_threshold_absolute_value = threshold_absolute_value
+        self.set_recommended_division_for_steps(time_step, actual_absolute_value, threshold_absolute_value)
 
+    def set_last_checked_okay(self) -> None:
+        self.do_last_failed = False
+
+    
     def set_recommended_division_for_steps(self, time_step, actual_absolute_value, threshold_absolute_value) -> None:
         reccommended_division = int(np.ceil(actual_absolute_value / threshold_absolute_value))
         max_division = int(np.ceil(time_step/self.config.min_time_step))
@@ -96,7 +113,6 @@ class AdaptabilityManager:
             value = np.quantile(self._value_history, self.config.max_quantile, method='higher')
         else: # self.config.max_quantile > 1.:
             value = self._get_value_by_extrapolated_quantile(self.config.max_quantile)
-        #ic(value)
         return float(value)
 
     def get_threshold_by_deviation(self) -> float:
@@ -138,20 +154,26 @@ class AdaptabilityManager:
     def check_adaptive_ok(self, time_step: float) -> bool:
         """Main class method to check if the time step is acceptable using all the different methods.
         Returns whether the step could run or not (decrease time step if not by `self.recommended_division_for_steps`)
+        Saves the results of the ckeck and worst_threshold value
         """
         if not self.config.is_adaptive:
             return True
         
         worst_threshold_value = self.get_worst_threshold_value()
-        #ic(worst_threshold_value)
 
-        if worst_threshold_value == -1:
-            return True
-        else: 
-            self.last_threshold_absolute_value = worst_threshold_value
-            is_ok = self.check_adaptive_ok_by_threshold(worst_threshold_value, time_step)
+        if self.get_value(time_step) == 0:
+            raise Exception("You are checking adaptability before applying forces or not having forces to apply")
+
+        is_ok = self.is_adaptive_ok_by_threshold(worst_threshold_value, time_step)
+        
+        if not is_ok:
+            self.set_last_checked_fail(worst_threshold_value, time_step)
+        else:
+            self.set_last_checked_okay()
 
         if time_step < self.config.min_time_step:
-            #ic("min time step reached", self.last_threshold_absolute_value, self.get_value(time_step))
+            ic("min time step reached", self._last_threshold_absolute_value, self.get_value(time_step))
+            ic.disable()
             return True
+        
         return is_ok
