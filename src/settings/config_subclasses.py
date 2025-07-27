@@ -12,6 +12,7 @@ from .nestedhash import NestedHash
 # May be should be dataclass
 
 class ConfigAdapt(NestedHash):
+    """Configuration for the adaptability of the steps in the simulation"""
     def __init__(self) -> None:
         self.is_adaptive = bool()
         self.max_quantile = float()
@@ -30,6 +31,7 @@ class ConfigAdapt(NestedHash):
         self.max_velocity_diff = value
 
 class ConfigSimulation(NestedHash):
+    """Configuration for the setting of the simulation"""
     def __init__(self) -> None:
         self.simulation_time = float()
         self.max_allowed_force = float()
@@ -75,6 +77,7 @@ class ConfigSimulation(NestedHash):
         return could_crass
 
 class ConfigPlotting(NestedHash):
+    """Configuration for the setting of the plotting of the simulation results"""
     def __init__(self) -> None:
         self.plotting_time = float()
         self.refresh_rate = int()
@@ -90,6 +93,7 @@ class ConfigPlotting(NestedHash):
         return int(math.ceil(number_of_time_steps / (self.plotting_time * self.refresh_rate))) # type: ignore
 
 class ConfigSizes(NestedHash):
+    """Configuration for the points sizes used in the plotting"""
     def __init__(self) -> None:
         self.min = float()
         self.max = float()

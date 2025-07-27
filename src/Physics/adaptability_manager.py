@@ -49,13 +49,15 @@ class AdaptabilityManager:
         self.recommended_division_for_steps:int = 2
 
     def store_value_in_history(self, time_step: float) -> None:
+        """Store the defined value from `get_value` function in the history, for a given time_step."""
         if self.config.is_adaptive:
             self._value_history = np.append(self._value_history, self.get_value(time_step))
             #self._value_log_history = np.append(self._value_log_history, np.log(self.get_value(time_step))) 
     
     # --- CHECK adaptive METHODS ---
     def check_adaptive_ok_by_threshold(self, threshold_absolute_value: float, time_step: float) -> bool:
-        #threshold_absolute_value
+        """Return wheteher the given threshold value makes the real value adaptative-ok (-1. means is ok)
+        And save the values"""
         actual_absolute_value = self.get_value(time_step)
         #ic(threshold_absolute_value, actual_absolute_value)
         is_ok: bool = actual_absolute_value < threshold_absolute_value
@@ -63,10 +65,10 @@ class AdaptabilityManager:
             self.do_last_failed = True
             self.last_threshold_absolute_value = threshold_absolute_value
             self.set_recommended_division_for_steps(time_step, actual_absolute_value, threshold_absolute_value)
-            #ic(self.recommended_division_for_steps)
             pass
         else:
             self.do_last_failed = False
+        
         return is_ok
 
     def set_recommended_division_for_steps(self, time_step, actual_absolute_value, threshold_absolute_value) -> None:
@@ -103,6 +105,7 @@ class AdaptabilityManager:
     
     @deprecated("Better to use `max_quantile`>1. instead")
     def get_threshold_by_relative_log_diff(self) -> float:
+        """DEPRECATED Returns the relative log difference-based threshold value."""
         IGNORED_EXTREMES = 0.1 # in %
         log_diff = np.percentile(self._value_log_history, 100-IGNORED_EXTREMES, method="higher") \
             - np.percentile(self._value_log_history, IGNORED_EXTREMES, method="lower")
@@ -112,8 +115,6 @@ class AdaptabilityManager:
 
     def get_worst_threshold_value(self) -> float:
         """Returns the worst threshold value. -1 if there is no calculation possible for the threshold, so it is ckecked coorrectly"""
-
-        # Ordered by computational cost
         worst_threshold_value = -1.
         
         # Ordered by computational cost
@@ -135,7 +136,9 @@ class AdaptabilityManager:
         return worst_threshold_value
 
     def check_adaptive_ok(self, time_step: float) -> bool:
-        """Main class method to check if the time step is acceptable using all the different methods."""
+        """Main class method to check if the time step is acceptable using all the different methods.
+        Returns whether the step could run or not (decrease time step if not by `self.recommended_division_for_steps`)
+        """
         if not self.config.is_adaptive:
             return True
         
@@ -152,15 +155,3 @@ class AdaptabilityManager:
             #ic("min time step reached", self.last_threshold_absolute_value, self.get_value(time_step))
             return True
         return is_ok
-
-
-
-
-
-
-
-
-
-
-
-

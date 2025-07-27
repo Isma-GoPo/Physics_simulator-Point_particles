@@ -27,8 +27,8 @@ CONFIGURATION.update(USER_SETTING_DICT)
 
 def main():
     #init_space = utils.init_space.orbiting_decelerating_particles
-    init_space = utils.init_space.solar_system
-    #init_space = utils.init_space.two_particles_from_repose
+    #init_space = utils.init_space.solar_system
+    init_space = utils.init_space.two_particles_from_repose
 
     space, custom_settings  = init_space()
 
@@ -43,7 +43,7 @@ def main():
         },
     }
 
-    CONFIGURATION.simulation.update(new_sim_settings)
+    #CONFIGURATION.simulation.update(new_sim_settings)
 
     space.config = CONFIGURATION.simulation
 

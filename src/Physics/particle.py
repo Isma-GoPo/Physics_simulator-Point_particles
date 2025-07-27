@@ -98,6 +98,7 @@ class Particle:
     
     @is_being_adaptive.setter
     def is_being_adaptive(self, state: bool) -> None:
+        """Set the state (adapatative) of the particle. Forcing to store the values it couldn't when it was being adaptative."""
         state = bool(state)
         if state != self._is_being_adaptive:    # Only works if it alternate it state
             self._is_being_adaptive = state
@@ -125,18 +126,22 @@ class Particle:
     # --- adaptive METHODS ---
     
     def velocity_differential(self, time_step: float = 1.0) -> float:
+        """Returns the velocity differential caused by the acceleration and the time step size.
+        It is used as meassure for adaptability"""
         value = float( np.linalg.norm(self.acceleration_to_apply) * time_step )
         return value
     
     def set_acceleration_from_velocity_differential(self, time_step: float = 1.0) -> None:
-            if self.adaptability.do_last_failed:
-                max_acceleration = self.adaptability.last_threshold_absolute_value / time_step
-                self.acceleration = self.acceleration/np.linalg.norm(self.acceleration) * max_acceleration
-            #ic(self.acceleration)
+        """Try to make the oposite of `velocity_differential`, returning an acceleration using the velocity_differential of the `AdaptabilityManager`"""
+        if self.adaptability.do_last_failed:
+            max_acceleration = self.adaptability.last_threshold_absolute_value / time_step
+            self.acceleration = self.acceleration/np.linalg.norm(self.acceleration) * max_acceleration
+        #ic(self.acceleration)
     
     # decorator
     @staticmethod
     def run_if_not_being_adaptative(adaptative_dependant_function: Callable[..., Any]) -> Callable[..., Any | None]:
+        """Diseable the taged function if the particle is in an adaptive state."""
         @wraps(adaptative_dependant_function)
         def wrapper_function(self, *args, **kwargs) -> Any | None:
             if not self.is_being_adaptive:

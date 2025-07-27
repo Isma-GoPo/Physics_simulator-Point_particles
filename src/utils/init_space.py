@@ -66,6 +66,7 @@ def two_particles_from_repose(initial_position: np.ndarray | None = None) -> tup
             "min_relative_time_step_reduction": 1e3,
             "adaptability": {
                 "is_adaptive": True,
+                "max_quantile": 4.,
                 "quantile_ignored_extremes": 10.,
                 "max_absolute_value": np.inf,
             },
