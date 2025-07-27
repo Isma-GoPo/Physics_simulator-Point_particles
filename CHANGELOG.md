@@ -1,5 +1,20 @@
 This is the log file. Its purpose is to have an idea of what I have done when I enter the project a long time later.
 
+
+## v0.7.2 [2025-07-XX]
+...
+- In adaptManager if setp< min try to check and if it fails is when `min_time_step_failed` should works instead of `do_last_time_failed`
+- Make that store_value in adaptability manager works when is not adaptative
+
+## v0.7.1 [2025-07-27]
+Quality of life improvements:
+- Solved bugs
+- Updated documentation inside code for all modules and packages 
+- Refactoring AdaptabilityManager code and solving a bug with adaptability
+  - Privatised last_threshold_absolute_value and only return it when do_last_failed is true, if not raise error
+  - Refactored `check_ok` for returning True or making changes, but not both
+- corrected some Particle and Space methods and properties
+
 ## v0.7 [2025-07-26]
 ###### Summary
 Adaptability in the simulation has been improved and added complexity and options. This possibility make the particle slower but more powerfull for being precise in extreme situations that needs more time steps.
