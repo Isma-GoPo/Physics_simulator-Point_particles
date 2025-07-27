@@ -23,7 +23,7 @@ def print_animated_simulation_by_space(particle_space: ParticleSpace) -> None:
     Arguments:
     particle_space: [ParticleSpace] space that contains the simulated particles
     """
-    position_history_array = particle_space.reduced_position_history_array(CONFIGURATION.plotting.plotting_relative_time_step(CONFIGURATION.simulation.number_of_time_steps))  # constants.PLOTTING_RELATIVE_TIME_STEP
+    position_history_array = particle_space.get_reduced_position_history_array(CONFIGURATION.plotting.plotting_relative_time_step(CONFIGURATION.simulation.number_of_time_steps))  # constants.PLOTTING_RELATIVE_TIME_STEP
     stacked_position_history_array = utils.arrays_utils.stack_positions(*position_history_array)
 
     x = stacked_position_history_array[:,:,0]

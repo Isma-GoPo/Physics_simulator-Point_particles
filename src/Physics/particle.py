@@ -53,7 +53,7 @@ class Particle:
         self._life_time = 0.0
         self._is_being_adaptive: bool = False
 
-        self.adaptaptability = AdaptabilityManager(self.velocity_differential)
+        self.adaptability = AdaptabilityManager(self.velocity_differential)
 
     # --- PROPERTIES ---
 
@@ -129,8 +129,8 @@ class Particle:
         return value
     
     def set_acceleration_from_velocity_differential(self, time_step: float = 1.0) -> None:
-            if self.adaptaptability.do_last_failed:
-                max_acceleration = self.adaptaptability.last_threshold_absolute_value / time_step
+            if self.adaptability.do_last_failed:
+                max_acceleration = self.adaptability.last_threshold_absolute_value / time_step
                 self.acceleration = self.acceleration/np.linalg.norm(self.acceleration) * max_acceleration
             #ic(self.acceleration)
     
@@ -199,7 +199,7 @@ class Particle:
     @run_if_not_being_adaptative
     def store_velocity_diff_in_history(self, time_step: float) -> None:
         """Stores the velocity difference in the adaptability propierty history."""
-        self.adaptaptability.store_value_in_history(time_step)
+        self.adaptability.store_value_in_history(time_step)
 
 
     def store_current_state(self) -> None:
@@ -217,7 +217,7 @@ class Particle:
         time_step: [s] for how much time do the acceleration occurs. Default: (0, 0, 0)
         """
         self.store_velocity_diff_in_history(time_step)
-        if time_step/2 < self.adaptaptability.config.min_time_step:
+        if time_step/2 < self.adaptability.config.min_time_step:
             self.set_acceleration_from_velocity_differential(time_step)
         self.do_accelerate(time_step)
         self.do_translate(time_step)

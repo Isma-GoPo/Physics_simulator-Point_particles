@@ -27,8 +27,8 @@ CONFIGURATION.update(USER_SETTING_DICT)
 
 def main():
     #init_space = utils.init_space.orbiting_decelerating_particles
-    #init_space = utils.init_space.circular_motion_decelerating_particle
-    init_space = utils.init_space.two_particles_from_repose
+    init_space = utils.init_space.solar_system
+    #init_space = utils.init_space.two_particles_from_repose
 
     space, custom_settings  = init_space()
 
@@ -36,7 +36,7 @@ def main():
     
     new_sim_settings = {
         #"simulation_time": 384852,
-        #"time_step": 10.,
+        #"time_step": 100.,
         "adaptability": {
             "is_adaptive": True,
             "max_absolute_value": np.inf,
@@ -51,10 +51,13 @@ def main():
     pprint(CONFIGURATION.simulation.as_dictionary)
     
 
-    space.run_simulation(CONFIGURATION.simulation.number_of_time_steps, CONFIGURATION.simulation.time_step)  
+    space.run_simulation()  
     
     print(CONFIGURATION)
     print_animated_simulation_by_space(space) 
+
+    #ic(space.position_history_array)
+    #ic(space[0].adaptability._value_history)
     
 
 # Running the file

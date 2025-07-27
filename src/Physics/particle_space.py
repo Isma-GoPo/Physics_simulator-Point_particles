@@ -31,6 +31,7 @@ class ParticleSpace(list):
         self._single_forces_array = single_forces_array if single_forces_array is not None else ()
         self._couple_forces_array = couple_forces_array if couple_forces_array is not None else ()
         self.config = simulation_config
+        
         self._life_time = 0.0
         
         self._is_being_adaptive = False
@@ -71,7 +72,7 @@ class ParticleSpace(list):
 
     @property
     def recommended_division_for_steps(self) -> int:
-        return_value = int(max(particle.adaptaptability.recommended_division_for_steps for particle in self))
+        return_value = int(max(particle.adaptability.recommended_division_for_steps for particle in self))
         return return_value
     
     @property
@@ -103,11 +104,16 @@ class ParticleSpace(list):
     @config.setter
     def config(self, new_simulation_config: ConfigSimulation) -> None:
         self._config = new_simulation_config
-        #for particle in self:
-        #    particle.config = new_simulation_config
+        for particle in self:
+            particle.adaptability.config = new_simulation_config.adaptability
         ic("Config updated")
             
+    # --- INITIALASING METHODS ---
     # --- METHODS ---
+    
+    def add_particle(self, particle: Particle) -> None:
+        """Append/add a particle to the space."""
+        self.append(particle)
 
 
     # --- RETURNING METHODS ---
@@ -121,10 +127,6 @@ class ParticleSpace(list):
         class_name = self.__class__.__name__
         attributes = ', '.join(repr(p) for p in self)
         return f"{class_name}([{attributes}])"
-    
-    def add_particle(self, particle: Particle) -> None:
-        """Add a particle to the space."""
-        self.append(particle)
 
     def get_particle_property_array(self, property_name: str) -> tuple[np.ndarray, ...]:
         """Return a tuple of arrays for the given property of each particle in the space."""
@@ -134,21 +136,18 @@ class ParticleSpace(list):
         """Return a list of arrays for the given property of each particle in the space."""
         return [getattr(particle, property_name) for particle in self]
 
-    def reduced_position_history_array(self, steps_relation: int = 1) -> tuple[np.ndarray, ...]:
+    def get_reduced_position_history_array(self, steps_relation: int = 1) -> tuple[np.ndarray, ...]:
+        """Return a tuple of reduced position history (`steps_relation` times smaller) arrays for each particle in the space."""
         return tuple(particle.position_history[::steps_relation] for particle in self)
     
     def check_adaptive_ok(self, time_step: float) -> bool:
-        """Return wheter the  tuple of the velocity difference arrays for each particle in the space.
-        
-        Arguments:
-        time_step: [s] the time step (to advance each particle) that will be checked
+        """Return wheter if the given time step is okay (adaptatibely correct) forall the particles in the space.
 
         Returns:
         True if the step size is okay, False if it should be shorter
         """
-        return all(particle.adaptaptability.check_adaptive_ok(time_step) for particle in self)
+        return all(particle.adaptability.check_adaptive_ok(time_step) for particle in self)
 
-    # --- INITIALASING METHODS ---
 
     # --- OPERATING METHODS ---
 
@@ -166,7 +165,6 @@ class ParticleSpace(list):
     def apply_couple_forces_array(self) -> None:
         """Apply the forces (in self) to each pair of particles in the space."""
         for i, particle1 in enumerate(self):
-            
             for particle2 in self[i+1:]:
                 for force in self._couple_forces_array:
                     force_to_apply: np.ndarray = force(particle1, particle2)
@@ -178,73 +176,53 @@ class ParticleSpace(list):
         self.apply_single_forces_array()
         self.apply_couple_forces_array()
 
-    def adapatative_recursive_iteration(self, time_step: float) -> None:
+    def _adapatative_recursive_iteration(self, time_step: float) -> None:
+        """Check if the time step is okay. Advance step if okay, or recursevilly reduce the time step if not.
+        """
+        # I cannot use `self.apply_all_forces_array` here because if it recursevilly rerun, it would apply it twice before advancing step
+        
         if self.check_adaptive_ok(time_step):
             self.advance_particles_time_step(time_step)
-        else:
-            self.is_being_adaptive = True
-            time_steps_division:int = 2#self.recommended_division_for_steps
-            lower_time_step = time_step/time_steps_division
-            assert not time_steps_division ==1 # Because if not, it could cause a loop (recursion error)
-            self.adapatative_recursive_iteration(lower_time_step)
-            for _ in range(time_steps_division-1):
-                self.apply_all_forces_array() # from one advance_particles_time_step to the other
-                self.adapatative_recursive_iteration(lower_time_step)
-
-            """self.is_being_adaptive = True
-            lower_time_step = time_step/2
-            
-            self.adapatative_recursive_iteration(lower_time_step)
-            self.apply_all_forces_array() # from one advance_particles_time_step to the other
-            self.adapatative_recursive_iteration(lower_time_step)"""
-
-    """def adapatative_recursive_iteration(self, time_step: float) -> None:
-        if self.check_adaptive_ok(time_step):
-            self.advance_particles_time_step(time_step)
-        elif self.recommended_division_for_steps == 1:
-            self.adapatative_iterate_time_step(time_step)
         else:
             self.is_being_adaptive = True
             time_steps_division:int = self.recommended_division_for_steps
             lower_time_step = time_step/time_steps_division
-            assert not time_steps_division ==1
-            self.adapatative_recursive_iteration(lower_time_step)
+            assert not time_steps_division ==1 # Because if not, it could cause a loop (recursion error)
+            self._adapatative_recursive_iteration(lower_time_step)
             for _ in range(time_steps_division-1):
-                self.apply_all_forces_array() # from one advance_particles_time_step to the other
-                self.adapatative_recursive_iteration(lower_time_step)"""
+                self._adapatative_recursive_iteration(lower_time_step)
+                self.apply_all_forces_array()
 
     def adapatative_iterate_time_step(self, time_step: float) -> None:
-        self.apply_all_forces_array() # move into self.adapatative_recursive_iteration
-        self.adapatative_recursive_iteration(time_step)
+        """Advance all particles in the space applying the forces adapting the given step into an scale that fulfil the "adaptability check".
+        """
+        self.apply_all_forces_array()
+        self._adapatative_recursive_iteration(time_step)
         self._life_time += time_step
         self.is_being_adaptive = False
 
     def iterate_time_step(self, time_step: float = 1.) -> None:
-        """Advance all particles in the space for the given steps operating with the given functions.
-        
-        Arguments:
-        time_step: [s] the time step to advance each particle.
+        """Advance all particles in the space applying the forces for the given step. No adaptability.
         """
         self.apply_all_forces_array()
         self.advance_particles_time_step(time_step)
         self._life_time += time_step
 
     @print_run_time
-    def run_simulation(self, 
-                       numer_of_time_steps: int, 
-                       time_step: float = 1.) -> None:
+    def run_simulation(self) -> None:
         """Iterates all particles in the space for the given steps applying them the given function/operations.
         
-        Arguments:
+        Uses from ConfigSimulation:
         numer_of_time_steps: [s] the number of time steps to advance each particle.
         time_step: [s] the time step to advance each particle.
+        adaptability.is_adaptive: [bool] if I want to run an adaptative simulation
         """
         if CONFIGURATION.simulation.could_crass:    
             raise Exception("Too many time steps could crash")
         
         if not self.config.adaptability.is_adaptive:
-            for _ in range(numer_of_time_steps):
-                self.iterate_time_step(time_step)
+            for _ in range(self.config.number_of_time_steps):
+                self.iterate_time_step(self.config.time_step)
         else: 
-            for _ in range(numer_of_time_steps):
-                self.adapatative_iterate_time_step(time_step)
+            for _ in range(self.config.number_of_time_steps):
+                self.adapatative_iterate_time_step(self.config.time_step)
