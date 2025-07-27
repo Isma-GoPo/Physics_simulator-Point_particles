@@ -1,5 +1,5 @@
 ## What I was doing in this commit
-
+- deleted max force -> adaptability `last_threshold_absolute_value` is better
 
 ## What is left
 - Privatize methods

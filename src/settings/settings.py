@@ -26,9 +26,6 @@ class Config(NestedHash):
             # How much the simulation last (in [s])
         self.simulation.time_step = 0.01
             # How much it "tick" advance the time in the simulation (in [s])
-            # 0.001 slow but really accurate
-        self.simulation.max_allowed_force = np.inf
-            # Maximum force module (norm) that can be applied to a particle (in [N]) `np.inf` means no limit
 
         self.simulation.adaptability = configs.ConfigAdapt()
         self.simulation.adaptability.is_adaptive = True

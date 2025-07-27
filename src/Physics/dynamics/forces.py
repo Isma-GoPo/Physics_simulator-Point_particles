@@ -25,7 +25,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from particle import Particle
 from physics.physics_constants import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'utils')))
-from arrays_utils import limit_force_module
 
 
 
@@ -33,7 +32,6 @@ from arrays_utils import limit_force_module
 
 # Single forces
 
-@limit_force_module
 def cinematic_cross_velocity_force(particle: Particle, field_vector: np.ndarray | None = None) -> np.ndarray:
     """Calculate a force perpendicular to the field and velocity -> Allows circular motion."""
     velocity_vector: np.ndarray = particle.velocity.copy()
@@ -43,7 +41,6 @@ def cinematic_cross_velocity_force(particle: Particle, field_vector: np.ndarray 
 
 # Couple forces
 
-@limit_force_module
 def cinematic_atraction_force(particle1: Particle, particle2: Particle, atraction_constant: np.floating|float = 1.0) -> np.ndarray:
     """Calculate a unitary force between two particles, inversily proportional to the square distance."""
     distance_vector: np.ndarray = particle2.position - particle1.position
@@ -56,7 +53,6 @@ def cinematic_atraction_force(particle1: Particle, particle2: Particle, atractio
 
 # Single forces
 
-@limit_force_module
 def viscosity_force(particle: Particle, viscosity_constant: np.floating|float = 1.0) -> np.ndarray:
     """Calculate a unitary viscosity force depending of the particle velocity."""
     velocity_vector: np.ndarray = particle.velocity.copy()
@@ -68,7 +64,6 @@ def viscosity_force(particle: Particle, viscosity_constant: np.floating|float = 
 
 # Couple forces
 
-@limit_force_module
 def gravitational_force(particle1: Particle, particle2: Particle) -> np.ndarray:
     """Calculate the Newton gravitational force between two particles."""
     distance_vector: np.ndarray = particle2.position - particle1.position

@@ -23,9 +23,9 @@ class ConfigAdapt(NestedHash):
         self.quantile_ignored_extremes = float()
 
     @property
-    def max_absolute_value(self) -> float:
-        return self.max_velocity_diff #should generally have this name, but because it is for velocity, it is more clear as it
-
+    def max_absolute_value(self) -> float:# should generally have this name, but because it is for velocity, it is more clear as it
+        return self.max_velocity_diff 
+    
     @max_absolute_value.setter
     def max_absolute_value(self, value: float) -> None:
         self.max_velocity_diff = value
@@ -34,7 +34,6 @@ class ConfigSimulation(NestedHash):
     """Configuration for the setting of the simulation"""
     def __init__(self) -> None:
         self.simulation_time = float()
-        self.max_allowed_force = float()
         self.adaptability = ConfigAdapt()
         self._time_step = float() # private because updates `adaptability`
 
