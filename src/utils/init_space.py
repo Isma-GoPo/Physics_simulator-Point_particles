@@ -14,13 +14,65 @@ import sys; import os; sys.path.append(os.path.abspath(os.path.join(os.path.dirn
 import physics
 
 
+def axis_orbits() -> tuple[physics.ParticleSpace, dict]:
+    """
+    Creates a particle space with a central particle and three particles orbiting in each axis
+
+    Return:
+    - Space particle of one central particle and three orbiting particles (one per axis)
+    - Custom settings dictionary for configuration: set simulation and adaptability
+    """
+    custom_settings = {
+        "simulation": {
+            "simulation_time": 40,
+            "time_step": 0.01,
+            "min_relative_time_step_reduction": 1e2,
+            "adaptability": {
+                "is_adaptive": True,
+                "max_quantile": 1.1,
+                "quantile_ignored_extremes": 15,
+            },
+        },
+    }
+
+    custom_settings = {}
+
+    distance:float = 1
+    velocity:float = 1
+
+    distance_1 = np.array([0.0, 0.0, distance])
+    velocity_2 = np.array([-velocity, 0.0, 0.0])
+
+    space = physics.ParticleSpace()
+    space.append(physics.Particle(1/physics.physics_constants.GRAVITATIONAL_CONSTANT, 
+        initial_position=np.array(np.array([0.0, 0.0, 0.0])),
+        initial_velocity= np.array(np.array([0.0, 0.0, 0.0])),
+        ))
+    
+    space.append(physics.Particle(1.0, 
+        initial_position=np.array(np.array([distance, 0.0, 0.0])),
+        initial_velocity= np.array(np.array([0.0, velocity, 0.0])),
+        ))
+    space.append(physics.Particle(1.0, 
+        initial_position=np.array(np.array([0.0, distance, 0.0])),
+        initial_velocity= np.array(np.array([0.0, 0.0, velocity])),
+        ))
+    space.append(physics.Particle(1.0, 
+        initial_position=np.array(np.array([0.0, 0.0, distance])),
+        initial_velocity= np.array(np.array([velocity, 0.0, 0.0])),
+        ))
+    
+    space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.gravitational_force,))
+
+    return space, custom_settings
+
 def three_elliptical_orbits() -> tuple[physics.ParticleSpace, dict]:
     """
     Creates a particle space with three orbiting particle with symetric ellipsis
 
     Return:
     - Space particle of three particles rotated 120º
-    - Custom settings dictionary for configuration: set simulation and adaptability
+    - Custom settings dictionary for configuration: set simulation, adaptability
     """
     custom_settings = {
         "simulation": {
@@ -108,19 +160,17 @@ def solar_system() -> tuple[physics.ParticleSpace, dict]:
     return space, custom_settings
 
 def two_particles_from_repose(initial_position: np.ndarray | None = None) -> tuple[physics.ParticleSpace, dict]:
-    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
+    """Creates a particle space with two opposing resting particles that attract each other.
+    
+    Return:
+    - Space particle with two opposing particles with mass=1, Ry=1, Vx=0 and real gravity field
+    - Custom settings dictionary for configuration: set simulation, plotting
+    """
     custom_settings = {
         "simulation": {
             "simulation_time": 96213*2, #1.05,
             "time_step": 10.,
             "min_relative_time_step_reduction": 1e2,
-            "adaptability": {
-                "is_adaptive": True,
-                "max_quantile": 4.,
-                "quantile_ignored_extremes": 10.,
-                "max_absolute_value": np.inf,
-            },
-            
         },
         "plotting": {
             "plotting_time": 3.,
@@ -137,16 +187,27 @@ def two_particles_from_repose(initial_position: np.ndarray | None = None) -> tup
     return space, custom_settings
 
 def two_particles_from_repose_adaptative(initial_position: np.ndarray | None = None) -> tuple[physics.ParticleSpace, dict]:
-    """Creates a particle space with mass=1, Vx=1 and with gravity field."""
+    """Creates a particle space with two opposing resting particles that accurately attract each other.
+    
+    Return:
+    - Space particle with two opposing particles with mass=1, Ry=1, Vx=0 and real gravity field
+    - Custom settings dictionary for configuration: set simulation, adaptability and plotting
+    """
     custom_settings = {
         "simulation": {
-            "simulation_time": 96213*2,
-            "time_step": 100,
-            "is_adaptative": True,
-            "max_velocity_diff": 0.00005
+            "simulation_time": 96213*2, #1.05,
+            "time_step": 10.,
+            "min_relative_time_step_reduction": 1e2,
+            "adaptability": {
+                "is_adaptive": True,
+                "max_quantile": 4.,
+                "quantile_ignored_extremes": 10.,
+                "max_absolute_value": np.inf,
+            },
+            
         },
         "plotting": {
-            "plotting_time": 3,
+            "plotting_time": 3.,
             "refresh_rate": 20,
             "do_repeat": False
         }
