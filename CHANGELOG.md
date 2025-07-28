@@ -1,5 +1,4 @@
-This is the log file. Its purpose is to have an idea of what I have done when I enter the project a long time later.
-
+In this file is where I added a breve description of all the changes I have done in the project (code and documentation) for having a traceability. Also as an explanation of what features are there and how they were implemented.
 
 ## v0.7.2 [2025-07-27]
 Quality of life improvements:
