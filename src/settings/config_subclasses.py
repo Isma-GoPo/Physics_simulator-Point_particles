@@ -81,6 +81,7 @@ class ConfigPlotting(NestedHash):
         self.plotting_time = float()
         self.refresh_rate = int()
         self.do_repeat = bool()
+        self.rotation = float(), float(), float() # tuple of three angles (in degrees)
         self.dot_sizes = ConfigSizes()
     
     @property

@@ -26,8 +26,13 @@ def print_animated_simulation_by_space(particle_space: ParticleSpace) -> None:
     position_history_array = particle_space.get_reduced_position_history_array(CONFIGURATION.plotting.plotting_relative_time_step(CONFIGURATION.simulation.number_of_time_steps))  # constants.PLOTTING_RELATIVE_TIME_STEP
     stacked_position_history_array = utils.arrays_utils.stack_positions(*position_history_array)
 
-    x = stacked_position_history_array[:,:,0]
-    y = stacked_position_history_array[:,:,2]
+    rotation_array = np.array(CONFIGURATION.plotting.rotation)*np.pi/180
+    rotation_matrix = utils.arrays_utils.rotation_matrix(*rotation_array)
+    rotated_stacked_position_history_array = stacked_position_history_array @ rotation_matrix.T # Same as rotation_matrix @ array only taking its last axis
+    
+    x = rotated_stacked_position_history_array[:,:,0]
+    y = rotated_stacked_position_history_array[:,:,1]
+
     number_of_frames = stacked_position_history_array.shape[0]
     number_of_particles = len(particle_space)
 

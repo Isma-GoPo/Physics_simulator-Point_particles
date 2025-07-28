@@ -57,7 +57,13 @@ def rotation_matrix_axis(axis: int | str, angle: float) -> np.ndarray:
             raise ValueError(f"Invalid axis: {axis} is not (1, 2, 3)")
 
 if __name__ == "__main__":
-    print(rotation_matrix_axis("x", np.pi/2))
+    a = np.array([1, 2, 3])
+    rot = rotation_matrix(0.5, 1, 2)
+    b = rot @ a
+    print(b)
+    c = a @ rot.T
+    print(c)
+    print(b==c)
 
 
     

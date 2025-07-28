@@ -48,6 +48,8 @@ class Config(NestedHash):
             # Recommended to make it so it plots 30 step every second
         self.plotting.do_repeat = False
             # If True, the plotting will repeat the last frame when it ends
+        self.plotting.rotation = (90., 0., 0.) # tuple of three angles (in degrees)
+            # This default totation print →x and ↑z
 
         self.plotting.dot_sizes = configs.ConfigSizes()
         self.plotting.dot_sizes.min = 15.0               

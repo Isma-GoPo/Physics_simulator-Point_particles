@@ -52,7 +52,7 @@ def main():
     space.config = CONFIGURATION.simulation
 
     #ic(CONFIGURATION)
-    pprint(CONFIGURATION.simulation.as_dictionary)
+    pprint(CONFIGURATION.as_dictionary)
     
 
     space.run_simulation()  
