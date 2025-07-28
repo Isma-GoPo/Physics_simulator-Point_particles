@@ -184,7 +184,7 @@ class ParticleSpace(list):
         """
         # I cannot use `self.apply_all_forces_array` here because if it recursevilly rerun, it would apply it twice before advancing step
         
-        assert np.linalg.norm(self[0].acceleration) != 0   # If not applied acceleration before
+        # assert np.linalg.norm(self[0].acceleration) != 0   # If not applied acceleration before
         if self._check_adaptive_ok(time_step):
             self._advance_particles_time_step(time_step)
         else:

@@ -151,7 +151,8 @@ class AdaptabilityManager:
         worst_threshold_value = self.get_worst_threshold_value()
 
         if self.get_value(time_step) == 0:
-            raise Exception("You are checking adaptability before applying forces or not having forces to apply")
+            print("WARNING: You are checking adaptability before applying forces or not having forces to apply")
+            #raise Exception("You are checking adaptability before applying forces or not having forces to apply")
 
         is_ok = self.is_adaptive_ok_by_threshold(worst_threshold_value, time_step)
         

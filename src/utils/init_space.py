@@ -6,19 +6,69 @@ Functions:
 import numpy as np
 from functools import partial
 
+# My modules
+from .arrays_utils import rotation_matrix_axis
+
 # Relative imports
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import sys; import os; sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import physics
 
 
+def three_elliptical_orbits() -> tuple[physics.ParticleSpace, dict]:
+    """
+    Creates a particle space with three orbiting particle with symetric ellipsis
+
+    Return:
+    - Space particle of three particles rotated 120º
+    - Custom settings dictionary for configuration: set simulation and adaptability
+    """
+    custom_settings = {
+        "simulation": {
+            "simulation_time": 40,
+            "time_step": 0.01,
+            "min_relative_time_step_reduction": 1e2,
+            "adaptability": {
+                "is_adaptive": True,
+                "max_quantile": 1.1,
+                "quantile_ignored_extremes": 15,
+            },
+        },
+    }
+
+    distance:float = 2
+    velocity:float = 0.3
+
+    rot = partial(rotation_matrix_axis, "y")
+    rot_2 = rot(2*np.pi*1/3)
+    rot_3 = rot(2*np.pi*2/3)
+
+    distance_1 = np.array([0.0, 0.0, distance])
+    velocity_2 = np.array([-velocity, 0.0, 0.0])
+
+    space = physics.ParticleSpace()
+    space.append(physics.Particle(1.0, 
+        initial_position=np.array(distance_1),
+        initial_velocity= np.array(velocity_2),
+        ))
+    space.append(physics.Particle(1.0, 
+        initial_position=np.array(rot_2 @ distance_1),
+        initial_velocity= np.array(rot_2 @ velocity_2),
+        ))
+    space.append(physics.Particle(1.0, 
+        initial_position=np.array(rot_3 @ distance_1),
+        initial_velocity= np.array(rot_3 @ velocity_2),
+        ))
+    
+    space.set_forces_to_apply(couple_forces_array=(physics.dynamics.forces.cinematic_atraction_force,))
+
+    return space, custom_settings
+
 def solar_system() -> tuple[physics.ParticleSpace, dict]:
-    """Creates a particle space with mass=1, Vx=1 and with gravity field.
+    """Creates a particle space simulating the solar system until mars.
     
     Return:
-    - Space particle
-    - Custom settings dictionary for updating the programm configuration
+    - Space particle with sun, mercury, venus, earth with moon and mars
+    - Custom settings dictionary for configuration: set simulation, plotting, dot_sizes
     """
     solar_system_data=[[1.989e30, 0.0, 0.0], #sun
                        [3.285e23, 47e9, 58.97e3], #mercury
