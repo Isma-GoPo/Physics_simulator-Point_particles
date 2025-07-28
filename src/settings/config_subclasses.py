@@ -82,6 +82,7 @@ class ConfigPlotting(NestedHash):
         self.refresh_rate = int()
         self.do_repeat = bool()
         self.rotation = float(), float(), float() # tuple of three angles (in degrees)
+        self.rotation_sequence = str()
         self.dot_sizes = ConfigSizes()
     
     @property

@@ -24,24 +24,24 @@ def axis_orbits() -> tuple[physics.ParticleSpace, dict]:
     """
     custom_settings = {
         "simulation": {
-            "simulation_time": 40,
+            "simulation_time": np.pi*2,
             "time_step": 0.01,
-            "min_relative_time_step_reduction": 1e2,
+
             "adaptability": {
-                "is_adaptive": True,
-                "max_quantile": 1.1,
-                "quantile_ignored_extremes": 15,
-            },
+                "is_adaptive": False,
+            }
+        },
+        "plotting": {
+            "plotting_time": 2.,
+            "refresh_rate": 20.,
+            "do_repeat": True,
+            "rotation": (5., 5., 0),
+            "rotation_sequence": "yxz"
         },
     }
 
-    custom_settings = {}
-
     distance:float = 1
     velocity:float = 1
-
-    distance_1 = np.array([0.0, 0.0, distance])
-    velocity_2 = np.array([-velocity, 0.0, 0.0])
 
     space = physics.ParticleSpace()
     space.append(physics.Particle(1/physics.physics_constants.GRAVITATIONAL_CONSTANT, 

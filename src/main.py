@@ -18,11 +18,8 @@ from settings import CONFIGURATION
 from constants import USER_SETTING_DICT
 
 
-ic(CONFIGURATION)
+# ic(CONFIGURATION)
 CONFIGURATION.update(USER_SETTING_DICT)
-#ic(CONFIGURATION)
-
-#ic.disable()
 
 
 def main():
@@ -49,9 +46,6 @@ def main():
 
     #CONFIGURATION.simulation.update(new_sim_settings)
 
-    space.config = CONFIGURATION.simulation
-
-    #ic(CONFIGURATION)
     pprint(CONFIGURATION.as_dictionary)
     
 
@@ -63,6 +57,10 @@ def main():
     print(len(space[0].adaptability._value_history))
     #ic(space.position_history_array)
     #ic(space[0].adaptability._value_history)
+
+    angles = np.array((45.0, 0, 0.0))*np.pi/180
+    print(utils.arrays_utils.rotation_matrix_sequenced(*angles, sequence="yxz"))
+    pass
     
 
 # Running the file

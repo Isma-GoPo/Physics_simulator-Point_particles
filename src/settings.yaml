@@ -1,9 +1,9 @@
 simulation:
-  simulation_time: 20.  # in secs
-  time_step: 0.01
+  simulation_time: 6.2  # in secs
+  time_step: 0.001
   min_relative_time_step_reduction: 1e2 # from adaptative but needs time step
   adaptability:
-    is_adaptive: True
+    is_adaptive: False
     max_quantile: 1.1 #2.
       # As lower is the value, more steps to process
     quantile_ignored_extremes: 15
@@ -11,13 +11,14 @@ simulation:
     #max_absolute_value: 1e-4 # meassure the adapatative accuracy
     #max_deviation: #900
 plotting: 
-  plotting_time: 10.
+  plotting_time: 2.
   refresh_rate: 20.
-  do_repeat: off
+  do_repeat: on
   rotation:
-  - 90.
+  - 5.
+  - 5.
   - 0.
-  - 0.
+  rotation_sequence: "yxz"
   dot_sizes:
     min: 15.0
     max: 75.0

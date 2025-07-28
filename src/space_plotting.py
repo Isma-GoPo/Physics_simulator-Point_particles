@@ -27,7 +27,9 @@ def print_animated_simulation_by_space(particle_space: ParticleSpace) -> None:
     stacked_position_history_array = utils.arrays_utils.stack_positions(*position_history_array)
 
     rotation_array = np.array(CONFIGURATION.plotting.rotation)*np.pi/180
-    rotation_matrix = utils.arrays_utils.rotation_matrix(*rotation_array)
+    rotation_matrix = utils.arrays_utils.rotation_matrix_sequenced(*rotation_array, sequence=CONFIGURATION.plotting.rotation_sequence)
+    ic(rotation_matrix)
+    
     rotated_stacked_position_history_array = stacked_position_history_array @ rotation_matrix.T # Same as rotation_matrix @ array only taking its last axis
     
     x = rotated_stacked_position_history_array[:,:,0]
