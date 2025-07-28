@@ -1,5 +1,15 @@
 This is the log file. Its purpose is to have an idea of what I have done when I enter the project a long time later.
 
+## v0.7.3 [2025-07-28]
+Added new init spaces (Three particles orbiting in elliptical orbits and 3 particles orbiting around a centered one in different x-y-z planes). And rotation features, such as array functions, setting and plotting configuration
+
+###### Rotation features
+- Added new rotation fucnctions
+  - Useful for setting the particle arrays
+  - For defining the plotting perspective
+- Added rotation angles and sequence in configuration
+- This configuration sets how the plotting of the animation will be visualized (its perspective)
+  - Before it always showed the y-normal plane. Now is custumizable by the three angles and sequence.
 
 ## v0.7.2 [2025-07-27]
 Quality of life improvements:
